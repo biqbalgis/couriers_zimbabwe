@@ -1,0 +1,2321 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pano Logistics Database Document</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#24392f;font:16px/1.65 Arial,Helvetica,sans-serif}.toolbar{background:#102f28;color:white;padding:16px 24px;display:flex;flex-wrap:wrap;gap:18px}.toolbar a{color:white;font-size:14px}.document{max-width:1120px;margin:32px auto;padding:48px 56px;background:white;border:1px solid #e0e8e3;border-radius:12px}h1,h2,h3{color:#000;line-height:1.25;scroll-margin-top:24px}h1{font-size:36px}h2{font-size:25px;margin-top:40px;border-bottom:1px solid #e0e8e3;padding-bottom:10px}h3{font-size:19px;margin-top:28px}a{color:#146c56}code{font:13px Consolas,monospace;overflow-wrap:anywhere}pre{background:#f5f7f5;padding:18px;border:1px solid #e0e8e3;border-radius:6px;overflow:auto}.table-wrap{overflow-x:auto;margin:20px 0}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.5}th,td{border:1px solid #d9d9d9;padding:10px 12px;text-align:left;vertical-align:middle;overflow-wrap:anywhere}th{background:#eaf0ec;color:black}tr:nth-child(even) td{background:#fafcfb}figure{margin:24px 0}figure svg{width:100%;height:auto;display:block}figcaption,footer{font-size:13px;color:#62766d}li{margin:6px 0}details{margin:16px 0}summary{cursor:pointer}footer{border-top:1px solid #e0e8e3;margin-top:40px;padding-top:16px}@media(max-width:700px){.document{margin:12px;padding:24px 18px}h1{font-size:28px}table{font-size:12px}}@media print{@page{size:A4;margin:18mm}.toolbar{display:none}body{background:white;font-size:10.5pt}.document{border:0;margin:0;padding:0;max-width:none}h1{font-size:25pt}h2{font-size:17pt;break-after:avoid}h3{font-size:13pt;break-after:avoid}table{font-size:8.5pt}thead{display:table-header-group}tr,figure{break-inside:avoid}.table-wrap{overflow:visible}pre{white-space:pre-wrap;overflow-wrap:anywhere}details{display:none}}</style></head><body><nav class="toolbar" aria-label="Document navigation"><a href="use-cases.html">Use cases</a><a href="workflows.html">Workflows</a><a href="database.html">Database and ER</a><a href="proposal-audit.html">Proposal audit</a><a href="launch-runbook.html">Launch runbook</a><a href="training.html">Training</a></nav><main class="document"><h1 id="pano-logistics-database-document">Pano Logistics Database Document</h1>
+<p>Version 1.1 · 1 October 2026 · Source-derived logical schema</p>
+<h2 id="purpose-and-database-boundaries">Purpose and database boundaries</h2>
+<p>This document is the data dictionary and entity relationship reference for the current Django application. It covers all 21 marketplace models, Django authentication and framework tables, and the separate custody archive. Field definitions are extracted from Django model metadata by export_schema.py; they are not an invented future schema.</p>
+<p>The reviewed local configuration uses SQLite. Setting POSTGRES_DB and the related connection variables selects PostgreSQL. The same Django migrations define the application schema. There are no PostGIS geometry columns in the current implementation, so no GiST spatial indexes exist. Station latitude and longitude are decimal values interpreted as EPSG:4326 coordinates; approximate seed coordinates are not surveyed premises.</p>
+<p>The primary relational database holds accounts, catalogs, shipments, tasks and financial records. Uploaded files live in MEDIA_ROOT and database file fields store paths, not file bytes. Authenticated /api/files/ requests enforce document access. The separate SQLite custody archive stores serialized events replicated through the outbox; it has no foreign keys to the primary database.</p>
+<h2 id="entity-relationship-diagrams">Entity relationship diagrams</h2>
+<p>The following diagrams divide the business schema into readable areas. Shared User and Parcel entities appear in more than one view. See <a href="er-diagram.mmd">the complete ER source</a> for every reflected table, field, relationship and optional cardinality, including framework tables.</p>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1180" height="783" viewBox="0 0 1180 783" role="img" aria-label="Network reference data and departures"><defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="none" stroke="#6f8c83" stroke-width="1.3"/></marker></defs><rect width="100%" height="100%" fill="#fafcfb"/><text x="35" y="32" font-family="Arial,sans-serif" font-size="21" font-weight="700" fill="#102f28">Network reference data and departures</text><text x="35" y="57" font-family="Arial,sans-serif" font-size="12" fill="#60766e">Child → parent references · ? nullable FK · U unique FK · arrows shown for entities present in this view</text><path d="M205 284 C205 236.5,205 236.5,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M590 284 C590 236.5,590 236.5,590 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M590 284 C590 236.5,205 236.5,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M975 284 C975 236.5,590 236.5,590 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M205 505 C205 446.5,205 446.5,205 388" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M205 505 C205 347,590 347,590 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M590 505 C590 347,205 347,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M590 505 C590 457.5,590 457.5,590 410" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M975 505 C975 347,590 347,590 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M975 505 C975 457.5,590 457.5,590 410" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><rect x="35" y="85" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 85H365Q375 85 375 95V124H35V95Q35 85 45 85" fill="#e5f2eb"/><text x="49" y="111" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">User</text><text x="49" y="146" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="170" font-family="Arial,sans-serif" font-size="12" fill="#60766e">No relational foreign keys</text><rect x="420" y="85" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M430 85H750Q760 85 760 95V124H420V95Q420 85 430 85" fill="#e5f2eb"/><text x="434" y="111" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">City</text><text x="434" y="146" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="434" y="170" font-family="Arial,sans-serif" font-size="12" fill="#60766e">No relational foreign keys</text><rect x="35" y="284" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 284H365Q375 284 375 294V323H35V294Q35 284 45 284" fill="#e5f2eb"/><text x="49" y="310" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Carrier</text><text x="49" y="345" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="369" font-family="Arial,sans-serif" font-size="12" fill="#40594f">user U → User</text><rect x="420" y="284" width="340" height="126" rx="10" fill="white" stroke="#cfdcd5"/><path d="M430 284H750Q760 284 760 294V323H420V294Q420 284 430 284" fill="#e5f2eb"/><text x="434" y="310" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Station</text><text x="434" y="345" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="434" y="369" font-family="Arial,sans-serif" font-size="12" fill="#40594f">city → City</text><text x="434" y="391" font-family="Arial,sans-serif" font-size="12" fill="#40594f">operator → User</text><rect x="805" y="284" width="340" height="126" rx="10" fill="white" stroke="#cfdcd5"/><path d="M815 284H1135Q1145 284 1145 294V323H805V294Q805 284 815 284" fill="#e5f2eb"/><text x="819" y="310" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">PilotRoute</text><text x="819" y="345" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="819" y="369" font-family="Arial,sans-serif" font-size="12" fill="#40594f">origin_city → City</text><text x="819" y="391" font-family="Arial,sans-serif" font-size="12" fill="#40594f">destination_city → City</text><rect x="35" y="505" width="340" height="148" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 505H365Q375 505 375 515V544H35V515Q35 505 45 505" fill="#e5f2eb"/><text x="49" y="531" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">CarrierTrip</text><text x="49" y="566" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="590" font-family="Arial,sans-serif" font-size="12" fill="#40594f">carrier → Carrier</text><text x="49" y="612" font-family="Arial,sans-serif" font-size="12" fill="#40594f">origin_city → City</text><text x="49" y="634" font-family="Arial,sans-serif" font-size="12" fill="#40594f">destination_city → City</text><rect x="420" y="505" width="340" height="126" rx="10" fill="white" stroke="#cfdcd5"/><path d="M430 505H750Q760 505 760 515V544H420V515Q420 505 430 505" fill="#e5f2eb"/><text x="434" y="531" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Rider</text><text x="434" y="566" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="434" y="590" font-family="Arial,sans-serif" font-size="12" fill="#40594f">user U → User</text><text x="434" y="612" font-family="Arial,sans-serif" font-size="12" fill="#40594f">home_station → Station</text><rect x="805" y="505" width="340" height="148" rx="10" fill="white" stroke="#cfdcd5"/><path d="M815 505H1135Q1145 505 1145 515V544H805V515Q805 505 815 505" fill="#e5f2eb"/><text x="819" y="531" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">RateTableEntry</text><text x="819" y="566" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="819" y="590" font-family="Arial,sans-serif" font-size="12" fill="#40594f">origin_city → City</text><text x="819" y="612" font-family="Arial,sans-serif" font-size="12" fill="#40594f">destination_city → City</text><text x="819" y="634" font-family="Arial,sans-serif" font-size="12" fill="#40594f">station_override ? → Station</text></svg>
+<figcaption>Network and shipment relationships</figcaption></figure>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1180" height="981" viewBox="0 0 1180 981" role="img" aria-label="Shipments custody and settlement"><defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="none" stroke="#6f8c83" stroke-width="1.3"/></marker></defs><rect width="100%" height="100%" fill="#fafcfb"/><text x="35" y="32" font-family="Arial,sans-serif" font-size="21" font-weight="700" fill="#102f28">Shipments custody and settlement</text><text x="35" y="57" font-family="Arial,sans-serif" font-size="12" fill="#60766e">Child → parent references · ? nullable FK · U unique FK · arrows shown for entities present in this view</text><path d="M420 214 C420 175.5,375 175.5,375 137" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M420 214 C420 186.5,1145 186.5,1145 159" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M205 438 C205 390.5,590 390.5,590 343" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M205 438 C205 313.5,205 313.5,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M590 438 C590 313.5,205 313.5,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M590 438 C590 390.5,590 390.5,590 343" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M975 438 C975 390.5,590 390.5,590 343" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M975 438 C975 313.5,205 313.5,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M205 703 C205 446,205 446,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M205 703 C205 523,590 523,590 343" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><rect x="35" y="85" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 85H365Q375 85 375 95V124H35V95Q35 85 45 85" fill="#e5f2eb"/><text x="49" y="111" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">User</text><text x="49" y="146" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="170" font-family="Arial,sans-serif" font-size="12" fill="#60766e">No relational foreign keys</text><rect x="420" y="85" width="340" height="258" rx="10" fill="white" stroke="#cfdcd5"/><path d="M430 85H750Q760 85 760 95V124H420V95Q420 85 430 85" fill="#e5f2eb"/><text x="434" y="111" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Parcel</text><text x="434" y="146" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="434" y="170" font-family="Arial,sans-serif" font-size="12" fill="#40594f">booked_by ? → User</text><text x="434" y="192" font-family="Arial,sans-serif" font-size="12" fill="#40594f">trip ? → CarrierTrip</text><text x="434" y="214" font-family="Arial,sans-serif" font-size="12" fill="#40594f">sender → User</text><text x="434" y="236" font-family="Arial,sans-serif" font-size="12" fill="#40594f">origin_station → Station</text><text x="434" y="258" font-family="Arial,sans-serif" font-size="12" fill="#40594f">destination_station → Station</text><text x="434" y="280" font-family="Arial,sans-serif" font-size="12" fill="#40594f">current_holder ? → User</text><text x="434" y="302" font-family="Arial,sans-serif" font-size="12" fill="#40594f">assigned_carrier ? → Carrier</text><text x="434" y="324" font-family="Arial,sans-serif" font-size="12" fill="#40594f">assigned_rider ? → Rider</text><rect x="805" y="85" width="340" height="148" rx="10" fill="white" stroke="#cfdcd5"/><path d="M815 85H1135Q1145 85 1145 95V124H805V95Q805 85 815 85" fill="#e5f2eb"/><text x="819" y="111" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">CarrierTrip</text><text x="819" y="146" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="819" y="170" font-family="Arial,sans-serif" font-size="12" fill="#40594f">carrier → Carrier</text><text x="819" y="192" font-family="Arial,sans-serif" font-size="12" fill="#40594f">origin_city → City</text><text x="819" y="214" font-family="Arial,sans-serif" font-size="12" fill="#40594f">destination_city → City</text><rect x="35" y="438" width="340" height="126" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 438H365Q375 438 375 448V477H35V448Q35 438 45 438" fill="#e5f2eb"/><text x="49" y="464" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Task</text><text x="49" y="499" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="523" font-family="Arial,sans-serif" font-size="12" fill="#40594f">parcel → Parcel</text><text x="49" y="545" font-family="Arial,sans-serif" font-size="12" fill="#40594f">assigned_to → User</text><rect x="420" y="438" width="340" height="170" rx="10" fill="white" stroke="#cfdcd5"/><path d="M430 438H750Q760 438 760 448V477H420V448Q420 438 430 438" fill="#e5f2eb"/><text x="434" y="464" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">StatusEvent</text><text x="434" y="499" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="434" y="523" font-family="Arial,sans-serif" font-size="12" fill="#40594f">released_by ? → User</text><text x="434" y="545" font-family="Arial,sans-serif" font-size="12" fill="#40594f">received_by ? → User</text><text x="434" y="567" font-family="Arial,sans-serif" font-size="12" fill="#40594f">parcel → Parcel</text><text x="434" y="589" font-family="Arial,sans-serif" font-size="12" fill="#40594f">actor ? → User</text><rect x="805" y="438" width="340" height="126" rx="10" fill="white" stroke="#cfdcd5"/><path d="M815 438H1135Q1145 438 1145 448V477H805V448Q805 438 815 438" fill="#e5f2eb"/><text x="819" y="464" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Payment</text><text x="819" y="499" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="819" y="523" font-family="Arial,sans-serif" font-size="12" fill="#40594f">parcel U → Parcel</text><text x="819" y="545" font-family="Arial,sans-serif" font-size="12" fill="#40594f">verified_by ? → User</text><rect x="35" y="703" width="340" height="148" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 703H365Q375 703 375 713V742H35V713Q35 703 45 703" fill="#e5f2eb"/><text x="49" y="729" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Payout</text><text x="49" y="764" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="788" font-family="Arial,sans-serif" font-size="12" fill="#40594f">beneficiary ? → User</text><text x="49" y="810" font-family="Arial,sans-serif" font-size="12" fill="#40594f">approved_by ? → User</text><text x="49" y="832" font-family="Arial,sans-serif" font-size="12" fill="#40594f">parcel → Parcel</text></svg>
+<figcaption>Custody and finance relationships</figcaption></figure>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1180" height="1092" viewBox="0 0 1180 1092" role="img" aria-label="Accounts support and integration records"><defs><marker id="arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><path d="M0 0L7 3.5L0 7" fill="none" stroke="#6f8c83" stroke-width="1.3"/></marker></defs><rect width="100%" height="100%" fill="#fafcfb"/><text x="35" y="32" font-family="Arial,sans-serif" font-size="21" font-weight="700" fill="#102f28">Accounts support and integration records</text><text x="35" y="57" font-family="Arial,sans-serif" font-size="12" fill="#60766e">Child → parent references · ? nullable FK · U unique FK · arrows shown for entities present in this view</text><path d="M420 214 C420 175.5,375 175.5,375 137" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M205 438 C205 313.5,205 313.5,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M205 438 C205 313.5,975 313.5,975 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M590 438 C590 313.5,205 313.5,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M590 438 C590 390.5,590 390.5,590 343" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M975 438 C975 390.5,590 390.5,590 343" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M205 659 C205 424,205 424,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><path d="M590 659 C590 424,205 424,205 189" fill="none" stroke="#9aafa7" stroke-width="1.4" opacity=".7" marker-end="url(#arrow)"/><rect x="35" y="85" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 85H365Q375 85 375 95V124H35V95Q35 85 45 85" fill="#e5f2eb"/><text x="49" y="111" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">User</text><text x="49" y="146" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="170" font-family="Arial,sans-serif" font-size="12" fill="#60766e">No relational foreign keys</text><rect x="420" y="85" width="340" height="258" rx="10" fill="white" stroke="#cfdcd5"/><path d="M430 85H750Q760 85 760 95V124H420V95Q420 85 430 85" fill="#e5f2eb"/><text x="434" y="111" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Parcel</text><text x="434" y="146" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="434" y="170" font-family="Arial,sans-serif" font-size="12" fill="#40594f">booked_by ? → User</text><text x="434" y="192" font-family="Arial,sans-serif" font-size="12" fill="#40594f">trip ? → CarrierTrip</text><text x="434" y="214" font-family="Arial,sans-serif" font-size="12" fill="#40594f">sender → User</text><text x="434" y="236" font-family="Arial,sans-serif" font-size="12" fill="#40594f">origin_station → Station</text><text x="434" y="258" font-family="Arial,sans-serif" font-size="12" fill="#40594f">destination_station → Station</text><text x="434" y="280" font-family="Arial,sans-serif" font-size="12" fill="#40594f">current_holder ? → User</text><text x="434" y="302" font-family="Arial,sans-serif" font-size="12" fill="#40594f">assigned_carrier ? → Carrier</text><text x="434" y="324" font-family="Arial,sans-serif" font-size="12" fill="#40594f">assigned_rider ? → Rider</text><rect x="805" y="85" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M815 85H1135Q1145 85 1145 95V124H805V95Q805 85 815 85" fill="#e5f2eb"/><text x="819" y="111" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">City</text><text x="819" y="146" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="819" y="170" font-family="Arial,sans-serif" font-size="12" fill="#60766e">No relational foreign keys</text><rect x="35" y="438" width="340" height="126" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 438H365Q375 438 375 448V477H35V448Q35 438 45 438" fill="#e5f2eb"/><text x="49" y="464" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Address</text><text x="49" y="499" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="523" font-family="Arial,sans-serif" font-size="12" fill="#40594f">user → User</text><text x="49" y="545" font-family="Arial,sans-serif" font-size="12" fill="#40594f">city → City</text><rect x="420" y="438" width="340" height="126" rx="10" fill="white" stroke="#cfdcd5"/><path d="M430 438H750Q760 438 760 448V477H420V448Q420 438 430 438" fill="#e5f2eb"/><text x="434" y="464" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">SupportTicket</text><text x="434" y="499" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="434" y="523" font-family="Arial,sans-serif" font-size="12" fill="#40594f">raised_by → User</text><text x="434" y="545" font-family="Arial,sans-serif" font-size="12" fill="#40594f">parcel ? → Parcel</text><rect x="805" y="438" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M815 438H1135Q1145 438 1145 448V477H805V448Q805 438 815 438" fill="#e5f2eb"/><text x="819" y="464" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">Notification</text><text x="819" y="499" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="819" y="523" font-family="Arial,sans-serif" font-size="12" fill="#40594f">parcel → Parcel</text><rect x="35" y="659" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 659H365Q375 659 375 669V698H35V669Q35 659 45 659" fill="#e5f2eb"/><text x="49" y="685" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">FinanceEvent</text><text x="49" y="720" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="744" font-family="Arial,sans-serif" font-size="12" fill="#40594f">actor → User</text><rect x="420" y="659" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M430 659H750Q760 659 760 669V698H420V669Q420 659 430 659" fill="#e5f2eb"/><text x="434" y="685" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">MutationReceipt</text><text x="434" y="720" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="434" y="744" font-family="Arial,sans-serif" font-size="12" fill="#40594f">user → User</text><rect x="805" y="659" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M815 659H1135Q1145 659 1145 669V698H805V669Q805 659 815 659" fill="#e5f2eb"/><text x="819" y="685" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">PhoneChallenge</text><text x="819" y="720" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="819" y="744" font-family="Arial,sans-serif" font-size="12" fill="#60766e">No relational foreign keys</text><rect x="35" y="858" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M45 858H365Q375 858 375 868V897H35V868Q35 858 45 858" fill="#e5f2eb"/><text x="49" y="884" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">IntegrationDelivery</text><text x="49" y="919" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="49" y="943" font-family="Arial,sans-serif" font-size="12" fill="#60766e">No relational foreign keys</text><rect x="420" y="858" width="340" height="104" rx="10" fill="white" stroke="#cfdcd5"/><path d="M430 858H750Q760 858 760 868V897H420V868Q420 858 430 858" fill="#e5f2eb"/><text x="434" y="884" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#102f28">PlatformSettings</text><text x="434" y="919" font-family="monospace" font-size="12" fill="#40594f">PK id</text><text x="434" y="943" font-family="Arial,sans-serif" font-size="12" fill="#60766e">No relational foreign keys</text></svg>
+<figcaption>Account and integration relationships</figcaption></figure>
+<p>Diagram arrows identify a foreign-key reference from child to parent. Labels state the child field. A 0..1 child-to-parent relationship means the foreign key is nullable; a unique foreign key makes the parent-to-child relationship 0..1 rather than 0..many. The complete Mermaid diagram uses crow's-foot notation.</p>
+<h2 id="table-inventory">Table inventory</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Physical table</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>User</td>
+<td>marketplace_user</td>
+<td>Account identity, authentication and the eight operational roles. Inherited Django authentication fields are retained.</td>
+</tr>
+<tr>
+<td>City</td>
+<td>marketplace_city</td>
+<td>Town and province reference data used by stations, rates, departures and addresses.</td>
+</tr>
+<tr>
+<td>Station</td>
+<td>marketplace_station</td>
+<td>Partner location, operator, contact payment number and optional geographic coordinates.</td>
+</tr>
+<tr>
+<td>Carrier</td>
+<td>marketplace_carrier</td>
+<td>One carrier profile per account with approval and vehicle details.</td>
+</tr>
+<tr>
+<td>Rider</td>
+<td>marketplace_rider</td>
+<td>One rider profile per account with home station, approval and availability.</td>
+</tr>
+<tr>
+<td>RateTableEntry</td>
+<td>marketplace_ratetableentry</td>
+<td>USD tariff for a directed city pair and weight band, optionally overridden at the origin station.</td>
+</tr>
+<tr>
+<td>Parcel</td>
+<td>marketplace_parcel</td>
+<td>Canonical shipment, price snapshot, selected receiving method, assignment links and current status/custody projection.</td>
+</tr>
+<tr>
+<td>Task</td>
+<td>marketplace_task</td>
+<td>Offered work for a first-mile, inter-town or last-mile leg, including final proof paths.</td>
+</tr>
+<tr>
+<td>StatusEvent</td>
+<td>marketplace_statusevent</td>
+<td>Accepted and rejected custody attempts with identities and time. Application-level append-only protection.</td>
+</tr>
+<tr>
+<td>Payment</td>
+<td>marketplace_payment</td>
+<td>One externally paid receipt per parcel with review decision and reviewer.</td>
+</tr>
+<tr>
+<td>Payout</td>
+<td>marketplace_payout</td>
+<td>An allocation line for rider, carrier, station or platform and its approval/disbursement record.</td>
+</tr>
+<tr>
+<td>SupportTicket</td>
+<td>marketplace_supportticket</td>
+<td>Support issue and message history stored as JSON, including external helpdesk reference.</td>
+</tr>
+<tr>
+<td>Notification</td>
+<td>marketplace_notification</td>
+<td>Shipment message addressed to a phone and its user read acknowledgement.</td>
+</tr>
+<tr>
+<td>Address</td>
+<td>marketplace_address</td>
+<td>Saved customer address, optionally the single default for that account.</td>
+</tr>
+<tr>
+<td>PlatformSettings</td>
+<td>marketplace_platformsettings</td>
+<td>Named JSON settings. Values are not a separate typed configuration schema.</td>
+</tr>
+<tr>
+<td>PilotRoute</td>
+<td>marketplace_pilotroute</td>
+<td>Active town pairs used to restrict booking, allowing either direction.</td>
+</tr>
+<tr>
+<td>CarrierTrip</td>
+<td>marketplace_carriertrip</td>
+<td>Approved carrier departure and capacity against which parcels are assigned.</td>
+</tr>
+<tr>
+<td>PhoneChallenge</td>
+<td>marketplace_phonechallenge</td>
+<td>Single-use, hashed phone verification challenge and its attempt counter.</td>
+</tr>
+<tr>
+<td>IntegrationDelivery</td>
+<td>marketplace_integrationdelivery</td>
+<td>Durable delivery outbox for SMS, helpdesk requests and archive replication.</td>
+</tr>
+<tr>
+<td>FinanceEvent</td>
+<td>marketplace_financeevent</td>
+<td>Application-level append-only audit of payout allocation and settlement actions.</td>
+</tr>
+<tr>
+<td>MutationReceipt</td>
+<td>marketplace_mutationreceipt</td>
+<td>Stored successful response and fingerprint for an account-scoped retry key.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="reading-the-data-dictionary">Reading the data dictionary</h2>
+<p>PK means primary key; FK means foreign key; UQ means unique; IDX means an indexed field. Django ordinarily indexes foreign keys and unique fields. Nullable refers to a database NULL; blank means form/serializer blank acceptance, which can differ from nullability. A callable default is run when an object is created. Auto created time means auto_now_add. Unlisted defaults mean there is no explicit field default. Business validation in DRF serializers and services can be stricter than these model-level definitions.</p>
+<p>Money uses Decimal with two fractional digits. Business primary identifiers use Django auto-increment fields; framework session keys are strings. Stored UTC-aware timestamps are interpreted in Africa/Harare for operational reporting. Date joined and last login belong to Django authentication rather than the parcel journey.</p>
+<h3 id="user">User</h3>
+<p>Physical table: marketplace_user. Account identity, authentication and the eight operational roles. Inherited Django authentication fields are retained.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>password</td>
+<td>Char (128)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>last_login</td>
+<td>DateTime</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>is_superuser</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default False</td>
+</tr>
+<tr>
+<td>username</td>
+<td>Char (150)</td>
+<td>No</td>
+<td>UQ</td>
+<td>—</td>
+</tr>
+<tr>
+<td>first_name</td>
+<td>Char (150)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>last_name</td>
+<td>Char (150)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>email</td>
+<td>Char (254)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>is_staff</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default False</td>
+</tr>
+<tr>
+<td>is_active</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default True</td>
+</tr>
+<tr>
+<td>date_joined</td>
+<td>DateTime</td>
+<td>No</td>
+<td>—</td>
+<td>Default now</td>
+</tr>
+<tr>
+<td>role</td>
+<td>Char (24)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default customer</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>Char (24)</td>
+<td>No</td>
+<td>UQ</td>
+<td>—</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Char (160)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>verified</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default False</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed role: <code>customer</code>, <code>rider</code>, <code>carrier</code>, <code>station_operator</code>, <code>ops</code>, <code>finance</code>, <code>support</code>, <code>admin</code>.</p>
+<h3 id="city">City</h3>
+<p>Physical table: marketplace_city. Town and province reference data used by stations, rates, departures and addresses.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Char (100)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>province</td>
+<td>Char (100)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite uniqueness:</p>
+<ul>
+<li>unique_city_region: (name, province)</li>
+</ul>
+<h3 id="station">Station</h3>
+<p>Physical table: marketplace_station. Partner location, operator, contact payment number and optional geographic coordinates.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Char (140)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>city_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_city.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>address</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>latitude</td>
+<td>Decimal (9, 6)</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>longitude</td>
+<td>Decimal (9, 6)</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>operator_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>active</td>
+<td>Boolean</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default True</td>
+</tr>
+<tr>
+<td>payment_number</td>
+<td>Char (32)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite indexes:</p>
+<ul>
+<li>marketplace_city_id_d27add_idx: (city, active)</li>
+</ul>
+<h3 id="carrier">Carrier</h3>
+<p>Physical table: marketplace_carrier. One carrier profile per account with approval and vehicle details.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>review_note</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>OneToOne</td>
+<td>No</td>
+<td>UQ; IDX; FK → marketplace_user.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>vehicle_type</td>
+<td>Char (80)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>licence_no</td>
+<td>Char (80)</td>
+<td>No</td>
+<td>UQ</td>
+<td>—</td>
+</tr>
+<tr>
+<td>capacity_kg</td>
+<td>Decimal (9, 2)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>status</td>
+<td>Char (12)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default pending</td>
+</tr>
+<tr>
+<td>document</td>
+<td>File (100)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed status: <code>pending</code>, <code>approved</code>, <code>rejected</code>.</p>
+<h3 id="rider">Rider</h3>
+<p>Physical table: marketplace_rider. One rider profile per account with home station, approval and availability.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>review_note</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>OneToOne</td>
+<td>No</td>
+<td>UQ; IDX; FK → marketplace_user.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>home_station_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_station.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>status</td>
+<td>Char (12)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default pending</td>
+</tr>
+<tr>
+<td>available</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default False</td>
+</tr>
+<tr>
+<td>document</td>
+<td>File (100)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed status: <code>pending</code>, <code>approved</code>, <code>rejected</code>.</p>
+<h3 id="ratetableentry">RateTableEntry</h3>
+<p>Physical table: marketplace_ratetableentry. USD tariff for a directed city pair and weight band, optionally overridden at the origin station.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>origin_city_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_city.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>destination_city_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_city.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>weight_band</td>
+<td>Char (32)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>price</td>
+<td>Decimal (10, 2)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>station_override_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_station.id; CASCADE</td>
+<td>Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite indexes:</p>
+<ul>
+<li>marketplace_origin__33077e_idx: (origin_city, destination_city, weight_band)</li>
+</ul>
+<p>Composite uniqueness:</p>
+<ul>
+<li>unique_rate_rule: (origin_city, destination_city, weight_band, station_override)</li>
+<li>unique_default_rate_rule: (origin_city, destination_city, weight_band); condition (AND: ('station_override__isnull', True))</li>
+</ul>
+<h3 id="parcel">Parcel</h3>
+<p>Physical table: marketplace_parcel. Canonical shipment, price snapshot, selected receiving method, assignment links and current status/custody projection.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>pickup_address</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>sender_name</td>
+<td>Char (160)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>sender_phone</td>
+<td>Char (24)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>booked_by_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>trip_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_carriertrip.id; PROTECT</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>otp_expires_at</td>
+<td>DateTime</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>otp_target</td>
+<td>Char (32)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>otp_attempts</td>
+<td>PositiveSmallInteger</td>
+<td>No</td>
+<td>—</td>
+<td>Default 0</td>
+</tr>
+<tr>
+<td>notes</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>delivery_choice</td>
+<td>Char (12)</td>
+<td>No</td>
+<td>—</td>
+<td>Default station</td>
+</tr>
+<tr>
+<td>delivery_address</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>code</td>
+<td>Char (6)</td>
+<td>No</td>
+<td>UQ; IDX</td>
+<td>—</td>
+</tr>
+<tr>
+<td>sender_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>recipient_name</td>
+<td>Char (160)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>recipient_phone</td>
+<td>Char (24)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>recipient_access_token</td>
+<td>Char (64)</td>
+<td>No</td>
+<td>UQ</td>
+<td>Default token_urlsafe</td>
+</tr>
+<tr>
+<td>origin_station_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_station.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>destination_station_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_station.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>weight_band</td>
+<td>Char (32)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>price</td>
+<td>Decimal (10, 2)</td>
+<td>No</td>
+<td>—</td>
+<td>Default 0</td>
+</tr>
+<tr>
+<td>photo</td>
+<td>File (100)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>status</td>
+<td>Char (32)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default booked</td>
+</tr>
+<tr>
+<td>current_holder_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_user.id; SET_NULL</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>assigned_carrier_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_carrier.id; SET_NULL</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>assigned_rider_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_rider.id; SET_NULL</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>handover_otp</td>
+<td>Char (128)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>DateTime</td>
+<td>No</td>
+<td>IDX</td>
+<td>Creation timestamp; Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed delivery_choice: <code>station</code>, <code>home</code>.</p>
+<p>Allowed status: <code>booked</code>, <code>picked_up</code>, <code>at_origin_station</code>, <code>in_transit</code>, <code>at_destination_station</code>, <code>out_for_delivery</code>, <code>delivered</code>, <code>exception</code>, <code>returned</code>, <code>cancelled</code>.</p>
+<h3 id="task">Task</h3>
+<p>Physical table: marketplace_task. Offered work for a first-mile, inter-town or last-mile leg, including final proof paths.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>parcel_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_parcel.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>type</td>
+<td>Char (30)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>assigned_to_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>status</td>
+<td>Char (12)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default offered</td>
+</tr>
+<tr>
+<td>proof_photo</td>
+<td>File (100)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>signature</td>
+<td>File (100)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed type: <code>first_mile_pickup</code>, <code>inter_town_transport</code>, <code>last_mile_delivery</code>.</p>
+<p>Allowed status: <code>offered</code>, <code>accepted</code>, <code>declined</code>, <code>completed</code>.</p>
+<h3 id="statusevent">StatusEvent</h3>
+<p>Physical table: marketplace_statusevent. Accepted and rejected custody attempts with identities and time. Application-level append-only protection.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>released_by_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>received_by_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>recipient_confirmed</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default False</td>
+</tr>
+<tr>
+<td>parcel_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_parcel.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>from_status</td>
+<td>Char (32)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>to_status</td>
+<td>Char (32)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>actor_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>note</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>otp_used</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default False</td>
+</tr>
+<tr>
+<td>accepted</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default True</td>
+</tr>
+<tr>
+<td>timestamp</td>
+<td>DateTime</td>
+<td>No</td>
+<td>IDX</td>
+<td>Creation timestamp; Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite indexes:</p>
+<ul>
+<li>marketplace_parcel__e2b8ae_idx: (parcel, timestamp)</li>
+</ul>
+<h3 id="payment">Payment</h3>
+<p>Physical table: marketplace_payment. One externally paid receipt per parcel with review decision and reviewer.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>transaction_reference</td>
+<td>Char (120)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>parcel_id</td>
+<td>OneToOne</td>
+<td>No</td>
+<td>UQ; IDX; FK → marketplace_parcel.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>amount</td>
+<td>Decimal (10, 2)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>method</td>
+<td>Char (40)</td>
+<td>No</td>
+<td>—</td>
+<td>Default mobile_money</td>
+</tr>
+<tr>
+<td>receipt_photo</td>
+<td>File (100)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>status</td>
+<td>Char (12)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default pending</td>
+</tr>
+<tr>
+<td>verified_by_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>verified_at</td>
+<td>DateTime</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed status: <code>pending</code>, <code>verified</code>, <code>rejected</code>.</p>
+<h3 id="payout">Payout</h3>
+<p>Physical table: marketplace_payout. An allocation line for rider, carrier, station or platform and its approval/disbursement record.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>beneficiary_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>approved_by_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>approved_at</td>
+<td>DateTime</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>disbursed_at</td>
+<td>DateTime</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>payment_reference</td>
+<td>Char (120)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>parcel_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_parcel.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>leg</td>
+<td>Char (16)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank legacy/route; first_mile or last_mile</td>
+</tr>
+<tr>
+<td>recipient</td>
+<td>Char (12)</td>
+<td>No</td>
+<td>IDX</td>
+<td>—</td>
+</tr>
+<tr>
+<td>period</td>
+<td>Char (20)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>amount</td>
+<td>Decimal (10, 2)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>status</td>
+<td>Char (20)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default pending</td>
+</tr>
+<tr>
+<td>statement_url</td>
+<td>Char (200)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed recipient: <code>rider</code>, <code>carrier</code>, <code>station</code>, <code>platform</code>.</p>
+<p>Composite uniqueness:</p>
+<ul>
+<li>unique_payout_leg: (parcel, recipient, leg, period)</li>
+</ul>
+<h3 id="supportticket">SupportTicket</h3>
+<p>Physical table: marketplace_supportticket. Support issue and message history stored as JSON, including external helpdesk reference.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>raised_by_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>parcel_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → marketplace_parcel.id; PROTECT</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>subject</td>
+<td>Char (200)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>status</td>
+<td>Char (20)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default open</td>
+</tr>
+<tr>
+<td>messages</td>
+<td>JSON</td>
+<td>No</td>
+<td>—</td>
+<td>Default list</td>
+</tr>
+<tr>
+<td>external_reference</td>
+<td>Char (120)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>received_after_hours</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default False</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>DateTime</td>
+<td>No</td>
+<td>IDX</td>
+<td>Creation timestamp; Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="notification">Notification</h3>
+<p>Physical table: marketplace_notification. Shipment message addressed to a phone and its user read acknowledgement.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>message</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>read_at</td>
+<td>DateTime</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>parcel_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_parcel.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>channel</td>
+<td>Char (8)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>trigger_event</td>
+<td>Char (32)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>recipient_phone</td>
+<td>Char (24)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>sent_at</td>
+<td>DateTime</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>status</td>
+<td>Char (20)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default queued</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed channel: <code>sms</code>, <code>push</code>.</p>
+<h3 id="address">Address</h3>
+<p>Physical table: marketplace_address. Saved customer address, optionally the single default for that account.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>label</td>
+<td>Char (80)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>contact_name</td>
+<td>Char (160)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>Char (24)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>city_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_city.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>address</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>is_default</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default False</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite uniqueness:</p>
+<ul>
+<li>one_default_address_per_user: (user); condition (AND: ('is_default', True))</li>
+</ul>
+<h3 id="platformsettings">PlatformSettings</h3>
+<p>Physical table: marketplace_platformsettings. Named JSON settings. Values are not a separate typed configuration schema.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>key</td>
+<td>Char (80)</td>
+<td>No</td>
+<td>UQ</td>
+<td>—</td>
+</tr>
+<tr>
+<td>value</td>
+<td>JSON</td>
+<td>No</td>
+<td>—</td>
+<td>Default dict</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="pilotroute">PilotRoute</h3>
+<p>Physical table: marketplace_pilotroute. Active town pairs used to restrict booking, allowing either direction.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Char (120)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>origin_city_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_city.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>destination_city_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_city.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>active</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default True</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="carriertrip">CarrierTrip</h3>
+<p>Physical table: marketplace_carriertrip. Approved carrier departure and capacity against which parcels are assigned.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>carrier_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_carrier.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>origin_city_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_city.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>destination_city_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_city.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>departure_at</td>
+<td>DateTime</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>capacity_kg</td>
+<td>Decimal (9, 2)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>active</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default True</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite indexes:</p>
+<ul>
+<li>marketplace_origin__898270_idx: (origin_city, destination_city, departure_at)</li>
+</ul>
+<h3 id="phonechallenge">PhoneChallenge</h3>
+<p>Physical table: marketplace_phonechallenge. Single-use, hashed phone verification challenge and its attempt counter.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>Char (24)</td>
+<td>No</td>
+<td>IDX</td>
+<td>—</td>
+</tr>
+<tr>
+<td>code_hash</td>
+<td>Char (128)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Char (160)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>role</td>
+<td>Char (24)</td>
+<td>No</td>
+<td>—</td>
+<td>Default customer</td>
+</tr>
+<tr>
+<td>expires_at</td>
+<td>DateTime</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>attempts</td>
+<td>PositiveSmallInteger</td>
+<td>No</td>
+<td>—</td>
+<td>Default 0</td>
+</tr>
+<tr>
+<td>used</td>
+<td>Boolean</td>
+<td>No</td>
+<td>—</td>
+<td>Default False</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>DateTime</td>
+<td>No</td>
+<td>—</td>
+<td>Creation timestamp; Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="integrationdelivery">IntegrationDelivery</h3>
+<p>Physical table: marketplace_integrationdelivery. Durable delivery outbox for SMS, helpdesk requests and archive replication.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>available_at</td>
+<td>DateTime</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default timezone.now; next support opening for after-hours helpdesk work</td>
+</tr>
+<tr>
+<td>kind</td>
+<td>Char (20)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>payload</td>
+<td>JSON</td>
+<td>No</td>
+<td>—</td>
+<td>Default dict</td>
+</tr>
+<tr>
+<td>status</td>
+<td>Char (20)</td>
+<td>No</td>
+<td>IDX</td>
+<td>Default queued</td>
+</tr>
+<tr>
+<td>attempts</td>
+<td>PositiveInteger</td>
+<td>No</td>
+<td>—</td>
+<td>Default 0</td>
+</tr>
+<tr>
+<td>last_error</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>external_reference</td>
+<td>Char (160)</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>DateTime</td>
+<td>No</td>
+<td>—</td>
+<td>Creation timestamp; Blank allowed</td>
+</tr>
+<tr>
+<td>delivered_at</td>
+<td>DateTime</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed kind: <code>sms</code>, <code>helpdesk</code>, <code>event_log</code>.</p>
+<h3 id="financeevent">FinanceEvent</h3>
+<p>Physical table: marketplace_financeevent. Application-level append-only audit of payout allocation and settlement actions.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>actor_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; PROTECT</td>
+<td>—</td>
+</tr>
+<tr>
+<td>action</td>
+<td>Char (50)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>reference</td>
+<td>Char (100)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>details</td>
+<td>JSON</td>
+<td>No</td>
+<td>—</td>
+<td>Default dict</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>DateTime</td>
+<td>No</td>
+<td>—</td>
+<td>Creation timestamp; Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="mutationreceipt">MutationReceipt</h3>
+<p>Physical table: marketplace_mutationreceipt. Stored successful response and fingerprint for an account-scoped retry key.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>key</td>
+<td>Char (80)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>fingerprint</td>
+<td>Char (64)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>response</td>
+<td>JSON</td>
+<td>No</td>
+<td>—</td>
+<td>Default dict</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>DateTime</td>
+<td>No</td>
+<td>—</td>
+<td>Creation timestamp; Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite uniqueness:</p>
+<ul>
+<li>unique_user_mutation: (user, key)</li>
+</ul>
+<h2 id="django-authentication-and-framework-tables">Django authentication and framework tables</h2>
+<p>These tables are created by installed Django applications or automatic many-to-many relationships. They are included so the reference describes the full modeled database rather than only business entities.</p>
+<h3 id="logentry">LogEntry</h3>
+<p>Physical table: django_admin_log. Django-managed authentication or framework record.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Auto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>action_time</td>
+<td>DateTime</td>
+<td>No</td>
+<td>—</td>
+<td>Default now</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>content_type_id</td>
+<td>ForeignKey</td>
+<td>Yes</td>
+<td>IDX; FK → django_content_type.id; SET_NULL</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>object_id</td>
+<td>Text</td>
+<td>Yes</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>object_repr</td>
+<td>Char (200)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>action_flag</td>
+<td>PositiveSmallInteger</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>change_message</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>Blank allowed</td>
+</tr>
+</tbody>
+</table></div>
+<p>Allowed action_flag: <code>1</code>, <code>2</code>, <code>3</code>.</p>
+<h3 id="permission">Permission</h3>
+<p>Physical table: auth_permission. Django-managed authentication or framework record.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Auto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Char (255)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>content_type_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → django_content_type.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>codename</td>
+<td>Char (100)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite uniqueness:</p>
+<ul>
+<li>Unique together: (content_type, codename)</li>
+</ul>
+<h3 id="group_permissions">Group_permissions</h3>
+<p>Physical table: auth_group_permissions. Django-managed authentication or framework record.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Auto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>group_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → auth_group.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>permission_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → auth_permission.id; CASCADE</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite uniqueness:</p>
+<ul>
+<li>Unique together: (group, permission)</li>
+</ul>
+<h3 id="group">Group</h3>
+<p>Physical table: auth_group. Django-managed authentication or framework record.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Auto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>name</td>
+<td>Char (150)</td>
+<td>No</td>
+<td>UQ</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="contenttype">ContentType</h3>
+<p>Physical table: django_content_type. Django-managed authentication or framework record.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Auto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>app_label</td>
+<td>Char (100)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>model</td>
+<td>Char (100)</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite uniqueness:</p>
+<ul>
+<li>Unique together: (app_label, model)</li>
+</ul>
+<h3 id="session">Session</h3>
+<p>Physical table: django_session. Django-managed authentication or framework record.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>session_key</td>
+<td>Char (40)</td>
+<td>No</td>
+<td>PK</td>
+<td>—</td>
+</tr>
+<tr>
+<td>session_data</td>
+<td>Text</td>
+<td>No</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>expire_date</td>
+<td>DateTime</td>
+<td>No</td>
+<td>IDX</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="user_groups">User_groups</h3>
+<p>Physical table: marketplace_user_groups. Django-managed authentication or framework record.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>group_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → auth_group.id; CASCADE</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite uniqueness:</p>
+<ul>
+<li>Unique together: (user, group)</li>
+</ul>
+<h3 id="user_user_permissions">User_user_permissions</h3>
+<p>Physical table: marketplace_user_user_permissions. Django-managed authentication or framework record.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Logical type</th>
+<th>Null</th>
+<th>Keys and reference</th>
+<th>Default or behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BigAuto</td>
+<td>No</td>
+<td>PK</td>
+<td>Blank allowed</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → marketplace_user.id; CASCADE</td>
+<td>—</td>
+</tr>
+<tr>
+<td>permission_id</td>
+<td>ForeignKey</td>
+<td>No</td>
+<td>IDX; FK → auth_permission.id; CASCADE</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Composite uniqueness:</p>
+<ul>
+<li>Unique together: (user, permission)</li>
+</ul>
+<h3 id="migration-recorder">Migration recorder</h3>
+<p>Physical table: django_migrations. Django records applied migrations here. It is not an ordinary registered application model and therefore is listed separately from the reflection output.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Auto-increment primary key</td>
+<td>Migration record identifier</td>
+</tr>
+<tr>
+<td>app</td>
+<td>String up to 255</td>
+<td>Application label</td>
+</tr>
+<tr>
+<td>name</td>
+<td>String up to 255</td>
+<td>Migration name</td>
+</tr>
+<tr>
+<td>applied</td>
+<td>Timestamp</td>
+<td>Application time</td>
+</tr>
+</tbody>
+</table></div>
+<p>SQLite internal tables, such as sqlite_sequence, are implementation details and are not business entities.</p>
+<h2 id="separate-custody-archive">Separate custody archive</h2>
+<p>Physical table: custody_events in the SQLite database configured by EVENT_ARCHIVE_PATH.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Constraint</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>event_id</td>
+<td>INTEGER</td>
+<td>Primary key</td>
+<td>Source StatusEvent identifier</td>
+</tr>
+<tr>
+<td>parcel_id</td>
+<td>INTEGER</td>
+<td>NOT NULL</td>
+<td>Source Parcel identifier; logical reference only</td>
+</tr>
+<tr>
+<td>payload</td>
+<td>TEXT</td>
+<td>NOT NULL</td>
+<td>JSON event snapshot</td>
+</tr>
+</tbody>
+</table></div>
+<p>The payload includes event_id, parcel_id, from_status, to_status, actor_id, released_by_id, received_by_id, recipient_confirmed, accepted, otp_used, note and timestamp. It does not contain the handover OTP itself. SQLite triggers reject updates and deletes. An insert with an existing event ID is accepted only if its serialized payload matches; mismatch requires investigation. These raw SQL statements are used only for this independent append-only archive.</p>
+<h2 id="important-integrity-rules">Important integrity rules</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Enforcement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>One phone and username per account</td>
+<td>Unique account fields</td>
+</tr>
+<tr>
+<td>One profile per rider or carrier account</td>
+<td>One-to-one user relationships</td>
+</tr>
+<tr>
+<td>Unique city and province combination</td>
+<td>unique_city_region</td>
+</tr>
+<tr>
+<td>One default tariff per directed city pair and band</td>
+<td>Conditional unique_default_rate_rule</td>
+</tr>
+<tr>
+<td>Unique station tariff override</td>
+<td>unique_rate_rule</td>
+</tr>
+<tr>
+<td>One payment per parcel</td>
+<td>One-to-one parcel relationship</td>
+</tr>
+<tr>
+<td>One payout line per parcel, category and period</td>
+<td>unique_payout_leg</td>
+</tr>
+<tr>
+<td>One default saved address per account</td>
+<td>Conditional one_default_address_per_user</td>
+</tr>
+<tr>
+<td>One successful retry receipt per account and key</td>
+<td>unique_user_mutation</td>
+</tr>
+<tr>
+<td>Fresh next-step OTP and accepted task</td>
+<td>Service checks, not database CHECK constraints</td>
+</tr>
+<tr>
+<td>Verified receipt before dispatch</td>
+<td>Service checks</td>
+</tr>
+<tr>
+<td>Balanced, single payout run</td>
+<td>Transactional service checks; line constraint alone does not enforce the total</td>
+</tr>
+<tr>
+<td>Custody and finance event immutability</td>
+<td>Model and QuerySet guards; primary database raw SQL can bypass these guards</td>
+</tr>
+<tr>
+<td>Archive immutability</td>
+<td>Independent archive triggers</td>
+</tr>
+</tbody>
+</table></div>
+<p>PROTECT preserves historical references by rejecting deletion of referenced records. CASCADE removes dependent profile/address/task or reference-data records as declared. SET_NULL clears a nullable reference if the referenced record is deleted. The normal user API deactivates users instead of deleting them.</p>
+<h2 id="sensitive-data-and-storage">Sensitive data and storage</h2>
+<p>User.password contains Django password hashes. PhoneChallenge.code_hash also stores a hash. Parcel.handover_otp stores a Django password hash of the six-digit code, is omitted from normal serialization and is cleared after transfer. Migration 0005 expires pre-existing codes. Active codes cannot be regenerated to reset the five-attempt budget. Recipient access tokens are secret bearer links and must not be logged or shared publicly.</p>
+<p>Identity documents, parcel images, receipts, delivery photos and signatures are private media. Support messages, outbox payloads and offline IndexedDB entries can also contain private data. Integration payloads may contain verification codes pending provider processing. A production retention and device-security policy is not implemented by the schema itself.</p>
+<p>New tracking SMS payloads include a logical notification_id, used to synchronize delivery status without a database FK. Historical payloads without this identifier are not retrospectively relinked. Profile phone is read-only through the self-service API to protect phone-scoped notification visibility.</p>
+<h2 id="data-ownership-and-normalization">Data ownership and normalization</h2>
+<p>Parcel is the canonical shipment. Its status and current_holder are projections of accepted custody events; assignments remain profile relationships, while Task holds each offered leg. Payment is a single receipt/review record rather than a ledger. Payout contains allocation categories and beneficiary snapshots rather than external bank transactions.</p>
+<p>SupportTicket.messages is an embedded JSON conversation, not a separate message table. PlatformSettings.value, FinanceEvent.details, IntegrationDelivery.payload and MutationReceipt.response are JSON documents. Outbox provider references and archive parcel IDs are logical identifiers without cross-database referential constraints.</p>
+<p>Parcel.assigned_rider is the current active assignment, while Task retains each completed worker. Payout.leg distinguishes first_mile and last_mile rider allocations and preserves historical beneficiary snapshots. Blank leg retains existing legacy/route allocations without changing their amounts or accounting history. Recipient delivery is represented by recipient_confirmed and a null current_holder rather than a foreign key to a recipient account.</p>
+<h2 id="indexes-and-query-behavior">Indexes and query behavior</h2>
+<p>In addition to primary, unique and foreign-key indexes, composite indexes cover station city/active lookup, rate route/band lookup, custody parcel/time history and carrier route/departure lookup. Status fields, phone challenges and relevant creation timestamps carry field indexes as shown above.</p>
+<p>The active UI uses server-side search, ordering and pagination. Default page size is 20, page_size can request up to 100, and management screens request 12 rows. Related shipment, payment, actor and custodian records are selected or prefetched in the UI query paths to reduce repeated database queries.</p>
+<p>Substring search can still require scans on large PostgreSQL catalogs. A future measured search workload may justify trigram indexes or dedicated full-text search; no such indexes exist today. Capacity, reporting and embedded conversations should also be profiled before scaling the pilot.</p>
+<h2 id="migrations-seed-data-and-maintenance">Migrations seed data and maintenance</h2>
+<p>The current marketplace schema is represented by migrations 0001 through 0005. Apply migrations through Django, not manual schema edits. The seed creates fictional Zimbabwe reference data, demo accounts, active pilot routing and an initial booked pilot shipment. It preserves existing records and passwords unless an explicit reset flag is used.</p>
+<p>Back up the primary database, MEDIA_ROOT and the separate archive together. Projection replay repairs only Parcel.status/current_holder after queued archive replication is complete. It does not restore tasks, payments, assignments, attachments or configuration.</p>
+<p>Regenerate model metadata without modifying data:</p>
+<pre><code class="language-powershell">python docs/export_schema.py
+</code></pre>
+<p>The JSON output is the authoritative input for this dictionary. New bookings require valid photos and partner creation/approval requires identity documents through serializers/services, even where model blank=True preserves old fixtures. Payout.leg retains the exact completed rider beneficiary, and IntegrationDelivery.available_at schedules after-hours contacts. Review services, serializers and migrations as well when behavior changes. See <a href="use-cases.html">Use cases</a> and <a href="workflows.html">Workflows</a>.</p><footer>Source-verified implementation · Version 1.1 · 1 October 2026. Print from the browser for a PDF copy.</footer></main></body></html>

@@ -1,0 +1,101 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pano Logistics Role Training Guide</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#24392f;font:16px/1.65 Arial,Helvetica,sans-serif}.toolbar{background:#102f28;color:white;padding:16px 24px;display:flex;flex-wrap:wrap;gap:18px}.toolbar a{color:white;font-size:14px}.document{max-width:1120px;margin:32px auto;padding:48px 56px;background:white;border:1px solid #e0e8e3;border-radius:12px}h1,h2,h3{color:#000;line-height:1.25;scroll-margin-top:24px}h1{font-size:36px}h2{font-size:25px;margin-top:40px;border-bottom:1px solid #e0e8e3;padding-bottom:10px}h3{font-size:19px;margin-top:28px}a{color:#146c56}code{font:13px Consolas,monospace;overflow-wrap:anywhere}pre{background:#f5f7f5;padding:18px;border:1px solid #e0e8e3;border-radius:6px;overflow:auto}.table-wrap{overflow-x:auto;margin:20px 0}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.5}th,td{border:1px solid #d9d9d9;padding:10px 12px;text-align:left;vertical-align:middle;overflow-wrap:anywhere}th{background:#eaf0ec;color:black}tr:nth-child(even) td{background:#fafcfb}figure{margin:24px 0}figure svg{width:100%;height:auto;display:block}figcaption,footer{font-size:13px;color:#62766d}li{margin:6px 0}details{margin:16px 0}summary{cursor:pointer}footer{border-top:1px solid #e0e8e3;margin-top:40px;padding-top:16px}@media(max-width:700px){.document{margin:12px;padding:24px 18px}h1{font-size:28px}table{font-size:12px}}@media print{@page{size:A4;margin:18mm}.toolbar{display:none}body{background:white;font-size:10.5pt}.document{border:0;margin:0;padding:0;max-width:none}h1{font-size:25pt}h2{font-size:17pt;break-after:avoid}h3{font-size:13pt;break-after:avoid}table{font-size:8.5pt}thead{display:table-header-group}tr,figure{break-inside:avoid}.table-wrap{overflow:visible}pre{white-space:pre-wrap;overflow-wrap:anywhere}details{display:none}}</style></head><body><nav class="toolbar" aria-label="Document navigation"><a href="use-cases.html">Use cases</a><a href="workflows.html">Workflows</a><a href="database.html">Database and ER</a><a href="proposal-audit.html">Proposal audit</a><a href="launch-runbook.html">Launch runbook</a><a href="training.html">Training</a></nav><main class="document"><h1 id="pano-logistics-role-training-guide">Pano Logistics Role Training Guide</h1>
+<p>Version 1.1 · 1 October 2026 · Mutare–Chipinge pilot</p>
+<h2 id="every-participant">Every participant</h2>
+<p>Use your own account. Keep passwords, verification codes and recipient secret links private. Confirm the parcel's six-digit shipment code and inspect the physical parcel before sharing a handover code. The handover code expires after fifteen minutes and locks after five attempts; an active code cannot be regenerated. Offline capture does not prove that the server accepted custody.</p>
+<h2 id="sender-and-recipient">Sender and recipient</h2>
+<ol>
+<li>Sender: sign in, choose the pilot direction/stations, add recipient phone in +263 format, weight band and a clear photo. Add a pickup address only if collection is needed.</li>
+<li>Check the quoted USD amount and confirm the booking. Pay the actual origin station number outside the app; upload a receipt. Operations verifies it before dispatch.</li>
+<li>Use parcel details to follow events and share the secret tracking link only with the recipient.</li>
+<li>Recipient: choose station collection or a real home address before delivery starts. Generate the receiving code only with the parcel in front of you. Inspect it before giving the code to the station or rider.</li>
+<li>Report a problem through support. Use the configured phone/helpdesk link for a call or guest contact. After-hours reports wait until the next 08:00 opening. Contact staff for refunds; the application does not refund automatically.</li>
+</ol>
+<h2 id="station-operator">Station operator</h2>
+<p>Book a walk-in parcel from your own station using the customer's name and phone, not your staff identity. Confirm payment numbers and receipt amount. On receipt, request the next code from the current custodian, check the shipment and confirm the station handover. Carrier/rider collection is confirmed by the receiving worker, not by marking the station release as a delivery. At destination, hold the parcel safely until self-collection or an accepted local-rider pickup. Obtain the recipient receiving code before confirming self-collection.</p>
+<h2 id="local-rider">Local rider</h2>
+<p>Apply with an identity/operating document and home station; wait for approval, then set availability. Review and accept the assigned pickup/delivery offer. For first-mile pickup obtain the sender's code; origin staff confirm arrival. For last mile obtain the destination station's releasing code, then the recipient's final receiving code. Capture a delivery photo and signature. Check Offline sync until queued work is accepted; if the code expires, obtain a fresh code and capture a new submission rather than editing an already-used retry key. Earnings and statements are allocations/recorded external payments, not a wallet balance.</p>
+<h2 id="inter-town-carrier">Inter-town carrier</h2>
+<p>Apply with identity, licence/vehicle documentation and capacity. After approval schedule the correct route and future departure. Accept offered route work; do not load beyond verified remaining capacity. Obtain the origin custodian's code and record departure. Destination staff confirm receipt using your releasing-party code. Your accepted route task remains active until destination receipt.</p>
+<h2 id="operations-and-finance">Operations and finance</h2>
+<p>Vet actual identity/vehicle documents before approval. Match riders by town and requested leg, carriers by scheduled route/capacity. Verify receipt against the booked amount before dispatch. Do not bypass requested pickup, custody states or proof requirements.</p>
+<p>For a delivered, verified parcel allocate first-mile rider, last-mile rider, carrier and origin-station amounts. Enter zero for unused legs; the platform receives the remainder. Rider beneficiaries are the workers who completed each leg. Review and approve allocations, make the payments externally, then record real references. Download statements and CSV and reconcile with the payment channel. Never record paid just to clear the dashboard.</p>
+<h2 id="support-and-administrator">Support and administrator</h2>
+<p>Use the chosen SaaS helpdesk/telephony system for live calls/chats. The local support companion captures issues, lookup and conversation updates for the bridge; it does not replace telephony. Work 08:00–20:00 Harare time according to the approved roster; handle overnight contacts from the next opening. Escalate custody/payment discrepancies with parcel code and evidence. Administrators maintain accounts, pilot route and configuration without sharing secrets in the browser.</p>
+<h2 id="training-acceptance-record">Training acceptance record</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Exercise</th>
+<th>Participant</th>
+<th>Date</th>
+<th>Outcome / follow-up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Book, pay and track</td>
+<td>To assign</td>
+<td>To record</td>
+<td>To record</td>
+</tr>
+<tr>
+<td>Pickup and origin receipt</td>
+<td>To assign</td>
+<td>To record</td>
+<td>To record</td>
+</tr>
+<tr>
+<td>Carrier departure and destination receipt</td>
+<td>To assign</td>
+<td>To record</td>
+<td>To record</td>
+</tr>
+<tr>
+<td>Self-collection and home POD</td>
+<td>To assign</td>
+<td>To record</td>
+<td>To record</td>
+</tr>
+<tr>
+<td>Offline queue and rejected/expired code</td>
+<td>To assign</td>
+<td>To record</td>
+<td>To record</td>
+</tr>
+<tr>
+<td>Receipt review and two-rider settlement</td>
+<td>To assign</td>
+<td>To record</td>
+<td>To record</td>
+</tr>
+<tr>
+<td>Support call and overnight contact</td>
+<td>To assign</td>
+<td>To record</td>
+<td>To record</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="feedback-and-learning-log">Feedback and learning log</h2>
+<p>After consented pilot journeys ask senders/recipients and carriers whether booking, custody, delivery and payment instructions were clear. Capture rating, comments and actionable issues through the operator's approved survey/helpdesk; no dedicated feedback table is implemented. Avoid recording unnecessary phone/identity details in shared documents.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Journey / date</th>
+<th>Participant type</th>
+<th>Rating / comment</th>
+<th>Improvement</th>
+<th>Owner / follow-up</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>To record</td>
+<td>Customer or carrier</td>
+<td>To record</td>
+<td>To record</td>
+<td>To assign</td>
+</tr>
+</tbody>
+</table></div>
+<p>See <a href="workflows.html">Workflows</a> for state-specific authority and <a href="launch-runbook.html">Launch runbook</a> for acceptance gates.</p><footer>Source-verified implementation · Version 1.1 · 1 October 2026. Print from the browser for a PDF copy.</footer></main></body></html>

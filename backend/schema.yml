@@ -1,0 +1,7534 @@
+openapi: 3.0.3
+info:
+  title: Pano Logistics API
+  version: 1.0.0
+paths:
+  /api/addresses/:
+    get:
+      operationId: addresses_list
+      parameters:
+      - in: query
+        name: address
+        schema:
+          type: string
+      - in: query
+        name: city
+        schema:
+          type: integer
+      - in: query
+        name: contact_name
+        schema:
+          type: string
+      - in: query
+        name: instructions
+        schema:
+          type: string
+      - in: query
+        name: is_default
+        schema:
+          type: boolean
+      - in: query
+        name: label
+        schema:
+          type: string
+      - in: query
+        name: latitude
+        schema:
+          type: number
+      - in: query
+        name: longitude
+        schema:
+          type: number
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: phone
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: user
+        schema:
+          type: integer
+      tags:
+      - addresses
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAddressList'
+          description: ''
+    post:
+      operationId: addresses_create
+      tags:
+      - addresses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Address'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+  /api/addresses/{id}/:
+    get:
+      operationId: addresses_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - addresses
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    put:
+      operationId: addresses_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - addresses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Address'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    patch:
+      operationId: addresses_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - addresses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAddress'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+    delete:
+      operationId: addresses_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - addresses
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/addresses/{id}/set-default/:
+    post:
+      operationId: addresses_set_default_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this address.
+        required: true
+      tags:
+      - addresses
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Address'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Address'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+          description: ''
+  /api/admin-audit/:
+    get:
+      operationId: admin_audit_list
+      parameters:
+      - in: query
+        name: action
+        schema:
+          type: string
+      - in: query
+        name: actor
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: target
+        schema:
+          type: string
+      tags:
+      - admin-audit
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditList'
+          description: ''
+  /api/admin-audit/{id}/:
+    get:
+      operationId: admin_audit_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this admin audit.
+        required: true
+      tags:
+      - admin-audit
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Audit'
+          description: ''
+  /api/auth/phone/request/:
+    post:
+      operationId: auth_phone_request_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PhoneRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PhoneRequest'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/auth/phone/verify/:
+    post:
+      operationId: auth_phone_verify_create
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PhoneVerify'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PhoneVerify'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PhoneVerify'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/auth/token/:
+    post:
+      operationId: auth_token_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/auth/token/refresh/:
+    post:
+      operationId: auth_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/carriers/:
+    get:
+      operationId: carriers_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - approved
+          - pending
+          - rejected
+        description: |-
+          * `pending` - Pending
+          * `approved` - Approved
+          * `rejected` - Rejected
+      - in: query
+        name: vehicle_type
+        schema:
+          type: string
+      tags:
+      - carriers
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCarrierList'
+          description: ''
+    post:
+      operationId: carriers_create
+      tags:
+      - carriers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Carrier'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Carrier'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Carrier'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+          description: ''
+  /api/carriers/{id}/:
+    get:
+      operationId: carriers_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this carrier.
+        required: true
+      tags:
+      - carriers
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+          description: ''
+    put:
+      operationId: carriers_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this carrier.
+        required: true
+      tags:
+      - carriers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Carrier'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Carrier'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Carrier'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+          description: ''
+    patch:
+      operationId: carriers_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this carrier.
+        required: true
+      tags:
+      - carriers
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCarrier'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCarrier'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCarrier'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+          description: ''
+    delete:
+      operationId: carriers_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this carrier.
+        required: true
+      tags:
+      - carriers
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/cities/:
+    get:
+      operationId: cities_list
+      parameters:
+      - in: query
+        name: name
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: province
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - cities
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCityList'
+          description: ''
+    post:
+      operationId: cities_create
+      tags:
+      - cities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/City'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/City'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/City'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+          description: ''
+  /api/cities/{id}/:
+    get:
+      operationId: cities_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this city.
+        required: true
+      tags:
+      - cities
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+          description: ''
+    put:
+      operationId: cities_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this city.
+        required: true
+      tags:
+      - cities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/City'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/City'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/City'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+          description: ''
+    patch:
+      operationId: cities_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this city.
+        required: true
+      tags:
+      - cities
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCity'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCity'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCity'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+          description: ''
+    delete:
+      operationId: cities_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this city.
+        required: true
+      tags:
+      - cities
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/cities/{id}/stations/:
+    get:
+      operationId: cities_stations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this city.
+        required: true
+      tags:
+      - cities
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/City'
+          description: ''
+  /api/custody-evidence/:
+    get:
+      operationId: custody_evidence_list
+      parameters:
+      - in: query
+        name: case
+        schema:
+          type: integer
+      - in: query
+        name: condition
+        schema:
+          type: string
+          enum:
+          - damaged
+          - intact
+          - missing
+          - packaging
+        description: |-
+          * `intact` - Intact
+          * `damaged` - Damaged
+          * `missing` - Contents missing
+          * `packaging` - Packaging concern
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: parcel
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - custody-evidence
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEvidenceList'
+          description: ''
+    post:
+      operationId: custody_evidence_create
+      tags:
+      - custody-evidence
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evidence'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Evidence'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Evidence'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evidence'
+          description: ''
+  /api/custody-evidence/{id}/:
+    get:
+      operationId: custody_evidence_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this custody evidence.
+        required: true
+      tags:
+      - custody-evidence
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evidence'
+          description: ''
+  /api/dashboard/:
+    get:
+      operationId: dashboard_retrieve
+      tags:
+      - dashboard
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/delivery-attempts/:
+    get:
+      operationId: delivery_attempts_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - in: query
+        name: outcome
+        schema:
+          type: string
+          enum:
+          - incorrect_address
+          - refused
+          - unavailable
+          - unreachable
+        description: |-
+          * `unavailable` - Recipient unavailable
+          * `incorrect_address` - Incorrect address
+          * `refused` - Refused
+          * `unreachable` - Unreachable
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: parcel
+        schema:
+          type: integer
+      - in: query
+        name: rider
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - delivery-attempts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAttemptList'
+          description: ''
+    post:
+      operationId: delivery_attempts_create
+      tags:
+      - delivery-attempts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Attempt'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Attempt'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Attempt'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attempt'
+          description: ''
+  /api/delivery-attempts/{id}/:
+    get:
+      operationId: delivery_attempts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this delivery attempt.
+        required: true
+      tags:
+      - delivery-attempts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attempt'
+          description: ''
+  /api/earnings/:
+    get:
+      operationId: earnings_retrieve
+      tags:
+      - earnings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/exports/{kind}/:
+    get:
+      operationId: exports_retrieve
+      parameters:
+      - in: path
+        name: kind
+        schema:
+          type: string
+        required: true
+      tags:
+      - exports
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/files/{path}:
+    get:
+      operationId: files_retrieve
+      parameters:
+      - in: path
+        name: path
+        schema:
+          type: string
+        required: true
+      tags:
+      - files
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/finance-audit/:
+    get:
+      operationId: finance_audit_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - finance-audit
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFinanceEventList'
+          description: ''
+  /api/finance-audit/{id}/:
+    get:
+      operationId: finance_audit_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this finance event.
+        required: true
+      tags:
+      - finance-audit
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinanceEvent'
+          description: ''
+  /api/integrations/status/:
+    get:
+      operationId: integrations_status_retrieve
+      tags:
+      - integrations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/locations/config/:
+    get:
+      operationId: locations_config_retrieve
+      tags:
+      - locations
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/locations/search/:
+    get:
+      operationId: locations_search_list
+      parameters:
+      - in: query
+        name: address
+        schema:
+          type: string
+          maxLength: 300
+          minLength: 3
+        required: true
+      tags:
+      - locations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationResult'
+          description: ''
+  /api/matching/{id}/assign/:
+    post:
+      operationId: matching_assign_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this parcel.
+        required: true
+      tags:
+      - matching
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Assignment'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/matching/unmatched/:
+    get:
+      operationId: matching_unmatched_retrieve
+      tags:
+      - matching
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/notifications/:
+    get:
+      operationId: notifications_list
+      parameters:
+      - in: query
+        name: channel
+        schema:
+          type: string
+          enum:
+          - push
+          - sms
+        description: |-
+          * `sms` - SMS
+          * `push` - Push
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      - in: query
+        name: trigger_event
+        schema:
+          type: string
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNotificationList'
+          description: ''
+  /api/notifications/{id}/:
+    get:
+      operationId: notifications_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this notification.
+        required: true
+      tags:
+      - notifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/notifications/{id}/read/:
+    post:
+      operationId: notifications_read_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this notification.
+        required: true
+      tags:
+      - notifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Notification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Notification'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Notification'
+          description: ''
+  /api/onboarding/{id}/approve/:
+    post:
+      operationId: onboarding_approve_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this carrier.
+        required: true
+      tags:
+      - onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Approval'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Approval'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Approval'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+          description: ''
+  /api/onboarding/{id}/reject/:
+    post:
+      operationId: onboarding_reject_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this carrier.
+        required: true
+      tags:
+      - onboarding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Approval'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Approval'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Approval'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Carrier'
+          description: ''
+  /api/operational-cases/:
+    get:
+      operationId: operational_cases_list
+      parameters:
+      - in: query
+        name: kind
+        schema:
+          type: string
+          enum:
+          - cancellation
+          - damage
+          - delay
+          - failed_delivery
+          - loss
+          - payment
+          - refund
+          - return
+        description: |-
+          * `cancellation` - Cancellation
+          * `return` - Return to sender
+          * `failed_delivery` - Failed delivery
+          * `refund` - Refund
+          * `loss` - Loss claim
+          * `damage` - Damage claim
+          * `delay` - Delay
+          * `payment` - Payment problem
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: parcel
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - approved
+          - in_progress
+          - paid
+          - rejected
+          - requested
+          - resolved
+        description: |-
+          * `requested` - Requested
+          * `approved` - Approved
+          * `rejected` - Rejected
+          * `in_progress` - In progress
+          * `paid` - Paid
+          * `resolved` - Resolved
+      tags:
+      - operational-cases
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCaseList'
+          description: ''
+    post:
+      operationId: operational_cases_create
+      tags:
+      - operational-cases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Case'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Case'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Case'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Case'
+          description: ''
+  /api/operational-cases/{id}/:
+    get:
+      operationId: operational_cases_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this operational case.
+        required: true
+      tags:
+      - operational-cases
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Case'
+          description: ''
+  /api/operational-cases/{id}/decide/:
+    post:
+      operationId: operational_cases_decide_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this operational case.
+        required: true
+      tags:
+      - operational-cases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Decision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Decision'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Case'
+          description: ''
+  /api/operational-cases/{id}/return-action/:
+    post:
+      operationId: operational_cases_return_action_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this operational case.
+        required: true
+      tags:
+      - operational-cases
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Return'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Return'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Return'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/operational-cases/export/:
+    get:
+      operationId: operational_cases_export_retrieve
+      tags:
+      - operational-cases
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Case'
+          description: ''
+  /api/operations/inbox/:
+    get:
+      operationId: operations_inbox_list
+      tags:
+      - operations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/operations/metrics/:
+    get:
+      operationId: operations_metrics_retrieve
+      tags:
+      - operations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/operations/policy/:
+    get:
+      operationId: operations_policy_retrieve
+      tags:
+      - operations
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+    put:
+      operationId: operations_policy_update
+      tags:
+      - operations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OperationalPolicy'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OperationalPolicy'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OperationalPolicy'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/parcels/:
+    get:
+      operationId: parcels_list
+      parameters:
+      - in: query
+        name: created_at__date
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: created_at__gte
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: created_at__lte
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: destination_station
+        schema:
+          type: integer
+      - in: query
+        name: destination_station__city
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - in: query
+        name: origin_station
+        schema:
+          type: integer
+      - in: query
+        name: origin_station__city
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - at_destination_station
+          - at_origin_station
+          - booked
+          - cancelled
+          - delivered
+          - exception
+          - in_transit
+          - out_for_delivery
+          - picked_up
+          - returned
+        description: |-
+          * `booked` - Booked
+          * `picked_up` - Picked up
+          * `at_origin_station` - At origin station
+          * `in_transit` - In transit
+          * `at_destination_station` - At destination station
+          * `out_for_delivery` - Out for delivery
+          * `delivered` - Delivered
+          * `exception` - Exception
+          * `returned` - Returned
+          * `cancelled` - Cancelled
+      tags:
+      - parcels
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedParcelList'
+          description: ''
+    post:
+      operationId: parcels_create
+      tags:
+      - parcels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Parcel'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Parcel'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Parcel'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/parcels/{code}/:
+    get:
+      operationId: parcels_retrieve
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/parcels/{code}/cancel/:
+    post:
+      operationId: parcels_cancel_create
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Note'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Note'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/parcels/{code}/delivery-choice/:
+    post:
+      operationId: parcels_delivery_choice_create
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Delivery'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Delivery'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Delivery'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/parcels/{code}/exception/:
+    post:
+      operationId: parcels_exception_create
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Note'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Note'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/parcels/{code}/handover/:
+    post:
+      operationId: parcels_handover_create
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Handover'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Handover'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Handover'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/parcels/{code}/handover-code/:
+    post:
+      operationId: parcels_handover_code_create
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CodeRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CodeRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/parcels/{code}/mark-paid/:
+    post:
+      operationId: parcels_mark_paid_create
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRecord'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentRecord'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentRecord'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/parcels/{code}/override/:
+    post:
+      operationId: parcels_override_create
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Override'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Override'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Override'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/parcels/{code}/receipt/:
+    get:
+      operationId: parcels_receipt_retrieve
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+          description: ''
+  /api/parcels/{code}/resolve-exception/:
+    post:
+      operationId: parcels_resolve_exception_create
+      parameters:
+      - in: path
+        name: code
+        schema:
+          type: string
+        required: true
+      tags:
+      - parcels
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExceptionResolution'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExceptionResolution'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExceptionResolution'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Parcel'
+          description: ''
+  /api/partners/{kind}/{id}/lifecycle/:
+    post:
+      operationId: partners_lifecycle_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: kind
+        schema:
+          type: string
+        required: true
+      tags:
+      - partners
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reason'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Reason'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Reason'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/payments/:
+    get:
+      operationId: payments_list
+      parameters:
+      - in: query
+        name: method
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - pending
+          - rejected
+          - verified
+        description: |-
+          * `pending` - Pending
+          * `verified` - Verified
+          * `rejected` - Rejected
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPaymentList'
+          description: ''
+    post:
+      operationId: payments_create
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Payment'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Payment'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/payments/{id}/:
+    get:
+      operationId: payments_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment.
+        required: true
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/payments/{id}/fraud-review/:
+    post:
+      operationId: payments_fraud_review_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FraudReview'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FraudReview'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FraudReview'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/payments/{id}/verify/:
+    post:
+      operationId: payments_verify_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payment.
+        required: true
+      tags:
+      - payments
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentDecision'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PaymentDecision'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PaymentDecision'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/payments/export/:
+    get:
+      operationId: payments_export_retrieve
+      tags:
+      - payments
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+          description: ''
+  /api/payouts/:
+    get:
+      operationId: payouts_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: period
+        schema:
+          type: string
+      - in: query
+        name: recipient
+        schema:
+          type: string
+          enum:
+          - carrier
+          - platform
+          - rider
+          - station
+        description: |-
+          * `rider` - Rider
+          * `carrier` - Carrier
+          * `station` - Station
+          * `platform` - Platform
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - payouts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPayoutList'
+          description: ''
+    post:
+      operationId: payouts_create
+      tags:
+      - payouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payout'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Payout'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Payout'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payout'
+          description: ''
+  /api/payouts/{id}/:
+    get:
+      operationId: payouts_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payout.
+        required: true
+      tags:
+      - payouts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payout'
+          description: ''
+  /api/payouts/{id}/settle/:
+    post:
+      operationId: payouts_settle_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payout.
+        required: true
+      tags:
+      - payouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settlement'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Settlement'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Settlement'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payout'
+          description: ''
+  /api/payouts/{id}/statement/:
+    get:
+      operationId: payouts_statement_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this payout.
+        required: true
+      tags:
+      - payouts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payout'
+          description: ''
+  /api/payouts/export/:
+    get:
+      operationId: payouts_export_retrieve
+      tags:
+      - payouts
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payout'
+          description: ''
+  /api/payouts/run/:
+    post:
+      operationId: payouts_run_create
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: period
+        schema:
+          type: string
+      - in: query
+        name: recipient
+        schema:
+          type: string
+          enum:
+          - carrier
+          - platform
+          - rider
+          - station
+        description: |-
+          * `rider` - Rider
+          * `carrier` - Carrier
+          * `station` - Station
+          * `platform` - Platform
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - payouts
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PayoutRun'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PayoutRun'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PayoutRun'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPayoutList'
+          description: ''
+  /api/pilot-routes/:
+    get:
+      operationId: pilot_routes_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - pilot-routes
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPilotList'
+          description: ''
+    post:
+      operationId: pilot_routes_create
+      tags:
+      - pilot-routes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pilot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pilot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pilot'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pilot'
+          description: ''
+  /api/pilot-routes/{id}/:
+    get:
+      operationId: pilot_routes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this pilot route.
+        required: true
+      tags:
+      - pilot-routes
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pilot'
+          description: ''
+    put:
+      operationId: pilot_routes_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this pilot route.
+        required: true
+      tags:
+      - pilot-routes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Pilot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Pilot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Pilot'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pilot'
+          description: ''
+    patch:
+      operationId: pilot_routes_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this pilot route.
+        required: true
+      tags:
+      - pilot-routes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPilot'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPilot'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPilot'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pilot'
+          description: ''
+    delete:
+      operationId: pilot_routes_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this pilot route.
+        required: true
+      tags:
+      - pilot-routes
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/rates/:
+    get:
+      operationId: rates_list
+      parameters:
+      - in: query
+        name: destination_city
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - in: query
+        name: origin_city
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: price
+        schema:
+          type: number
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: station_override
+        schema:
+          type: integer
+      - in: query
+        name: weight_band
+        schema:
+          type: string
+      tags:
+      - rates
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRateList'
+          description: ''
+    post:
+      operationId: rates_create
+      tags:
+      - rates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rate'
+          description: ''
+  /api/rates/{id}/:
+    get:
+      operationId: rates_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rate table entry.
+        required: true
+      tags:
+      - rates
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rate'
+          description: ''
+    put:
+      operationId: rates_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rate table entry.
+        required: true
+      tags:
+      - rates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rate'
+          description: ''
+    patch:
+      operationId: rates_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rate table entry.
+        required: true
+      tags:
+      - rates
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRate'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rate'
+          description: ''
+    delete:
+      operationId: rates_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rate table entry.
+        required: true
+      tags:
+      - rates
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/rates/lookup/:
+    get:
+      operationId: rates_lookup_retrieve
+      tags:
+      - rates
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rate'
+          description: ''
+  /api/reports/summary/:
+    get:
+      operationId: reports_summary_retrieve
+      tags:
+      - reports
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/riders/:
+    get:
+      operationId: riders_list
+      parameters:
+      - in: query
+        name: available
+        schema:
+          type: boolean
+      - in: query
+        name: home_station
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - approved
+          - pending
+          - rejected
+        description: |-
+          * `pending` - Pending
+          * `approved` - Approved
+          * `rejected` - Rejected
+      tags:
+      - riders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRiderList'
+          description: ''
+    post:
+      operationId: riders_create
+      tags:
+      - riders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rider'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rider'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rider'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rider'
+          description: ''
+  /api/riders/{id}/:
+    get:
+      operationId: riders_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rider.
+        required: true
+      tags:
+      - riders
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rider'
+          description: ''
+    put:
+      operationId: riders_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rider.
+        required: true
+      tags:
+      - riders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Rider'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Rider'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Rider'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rider'
+          description: ''
+    patch:
+      operationId: riders_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rider.
+        required: true
+      tags:
+      - riders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRider'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRider'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRider'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rider'
+          description: ''
+    delete:
+      operationId: riders_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this rider.
+        required: true
+      tags:
+      - riders
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/riders/availability/:
+    post:
+      operationId: riders_availability_create
+      tags:
+      - riders
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Availability'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Availability'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Availability'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rider'
+          description: ''
+  /api/schema/:
+    get:
+      operationId: schema_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - schema
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/settings/:
+    get:
+      operationId: settings_list
+      parameters:
+      - in: query
+        name: key
+        schema:
+          type: string
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSettingsList'
+          description: ''
+    post:
+      operationId: settings_create
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Settings'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Settings'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+          description: ''
+  /api/settings/{key}/:
+    get:
+      operationId: settings_retrieve
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+          description: ''
+    put:
+      operationId: settings_update
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Settings'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Settings'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Settings'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+          description: ''
+    patch:
+      operationId: settings_partial_update
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSettings'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSettings'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSettings'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Settings'
+          description: ''
+    delete:
+      operationId: settings_destroy
+      parameters:
+      - in: path
+        name: key
+        schema:
+          type: string
+        required: true
+      tags:
+      - settings
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/stations/:
+    get:
+      operationId: stations_list
+      parameters:
+      - in: query
+        name: active
+        schema:
+          type: boolean
+      - in: query
+        name: city
+        schema:
+          type: integer
+      - in: query
+        name: operator
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: service_status
+        schema:
+          type: string
+          enum:
+          - closed
+          - limited
+          - open
+        description: |-
+          * `open` - Open
+          * `limited` - Limited
+          * `closed` - Closed
+      tags:
+      - stations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStationList'
+          description: ''
+    post:
+      operationId: stations_create
+      tags:
+      - stations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Station'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Station'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Station'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+          description: ''
+  /api/stations/{id}/:
+    get:
+      operationId: stations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this station.
+        required: true
+      tags:
+      - stations
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+          description: ''
+    put:
+      operationId: stations_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this station.
+        required: true
+      tags:
+      - stations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Station'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Station'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Station'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+          description: ''
+    patch:
+      operationId: stations_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this station.
+        required: true
+      tags:
+      - stations
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedStation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedStation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedStation'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+          description: ''
+    delete:
+      operationId: stations_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this station.
+        required: true
+      tags:
+      - stations
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/status-events/:
+    get:
+      operationId: status_events_list
+      parameters:
+      - in: query
+        name: accepted
+        schema:
+          type: boolean
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: parcel
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: to_status
+        schema:
+          type: string
+      tags:
+      - status-events
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedStatusEventList'
+          description: ''
+  /api/status-events/{id}/:
+    get:
+      operationId: status_events_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this status event.
+        required: true
+      tags:
+      - status-events
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusEvent'
+          description: ''
+  /api/support/:
+    get:
+      operationId: support_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: parcel
+        schema:
+          type: integer
+      - in: query
+        name: received_after_hours
+        schema:
+          type: boolean
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+      tags:
+      - support
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSupportTicketList'
+          description: ''
+    post:
+      operationId: support_create
+      tags:
+      - support
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SupportTicket'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/SupportTicket'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/SupportTicket'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportTicket'
+          description: ''
+  /api/support-contact/:
+    get:
+      operationId: support_contact_retrieve
+      tags:
+      - support-contact
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/support/{id}/:
+    get:
+      operationId: support_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this support ticket.
+        required: true
+      tags:
+      - support
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportTicket'
+          description: ''
+  /api/support/{id}/reply/:
+    post:
+      operationId: support_reply_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this support ticket.
+        required: true
+      tags:
+      - support
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reply'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Reply'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Reply'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportTicket'
+          description: ''
+  /api/support/{id}/set-status/:
+    post:
+      operationId: support_set_status_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this support ticket.
+        required: true
+      tags:
+      - support
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketStatus'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TicketStatus'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TicketStatus'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportTicket'
+          description: ''
+  /api/support/parcel-lookup/:
+    get:
+      operationId: support_parcel_lookup_retrieve
+      tags:
+      - support
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SupportTicket'
+          description: ''
+  /api/tasks/:
+    get:
+      operationId: tasks_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: parcel
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - accepted
+          - completed
+          - declined
+          - offered
+        description: |-
+          * `offered` - Offered
+          * `accepted` - Accepted
+          * `declined` - Declined
+          * `completed` - Completed
+      - in: query
+        name: type
+        schema:
+          type: string
+          enum:
+          - first_mile_pickup
+          - inter_town_transport
+          - last_mile_delivery
+        description: |-
+          * `first_mile_pickup` - First-mile pickup
+          * `inter_town_transport` - Inter-town transport
+          * `last_mile_delivery` - Last-mile delivery
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTaskList'
+          description: ''
+    post:
+      operationId: tasks_create
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Task'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Task'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Task'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/tasks/{id}/:
+    get:
+      operationId: tasks_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this task.
+        required: true
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/tasks/{id}/accept/:
+    post:
+      operationId: tasks_accept_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this task.
+        required: true
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/tasks/{id}/complete/:
+    post:
+      operationId: tasks_complete_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this task.
+        required: true
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCompletion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TaskCompletion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TaskCompletion'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/tasks/{id}/decline/:
+    post:
+      operationId: tasks_decline_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this task.
+        required: true
+      tags:
+      - tasks
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/tasks/{id}/proof/:
+    post:
+      operationId: tasks_proof_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this task.
+        required: true
+      tags:
+      - tasks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCompletion'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TaskCompletion'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TaskCompletion'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: ''
+  /api/track/{token}/:
+    get:
+      operationId: track_retrieve
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - track
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicParcel'
+          description: ''
+  /api/track/{token}/code/:
+    post:
+      operationId: track_code_create
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - track
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/track/{token}/preferences/:
+    get:
+      operationId: track_preferences_retrieve
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - track
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicParcel'
+          description: ''
+    post:
+      operationId: track_preferences_create
+      parameters:
+      - in: path
+        name: token
+        schema:
+          type: string
+        required: true
+      tags:
+      - track
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Delivery'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Delivery'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Delivery'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PublicParcel'
+          description: ''
+  /api/trips/:
+    get:
+      operationId: trips_list
+      parameters:
+      - in: query
+        name: active
+        schema:
+          type: boolean
+      - in: query
+        name: carrier
+        schema:
+          type: integer
+      - in: query
+        name: destination_city
+        schema:
+          type: integer
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - in: query
+        name: origin_city
+        schema:
+          type: integer
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      tags:
+      - trips
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTripList'
+          description: ''
+    post:
+      operationId: trips_create
+      tags:
+      - trips
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Trip'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Trip'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Trip'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+          description: ''
+  /api/trips/{id}/:
+    get:
+      operationId: trips_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this carrier trip.
+        required: true
+      tags:
+      - trips
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+          description: ''
+    patch:
+      operationId: trips_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this carrier trip.
+        required: true
+      tags:
+      - trips
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTrip'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTrip'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTrip'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trip'
+          description: ''
+  /api/users/:
+    get:
+      operationId: users_list
+      parameters:
+      - name: ordering
+        required: false
+        in: query
+        description: Which field to use when ordering the results.
+        schema:
+          type: string
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: role
+        schema:
+          type: string
+          enum:
+          - admin
+          - carrier
+          - customer
+          - finance
+          - ops
+          - rider
+          - station_operator
+          - support
+        description: |-
+          * `customer` - Customer
+          * `rider` - Rider
+          * `carrier` - Carrier
+          * `station_operator` - Station operator
+          * `ops` - Ops
+          * `finance` - Finance
+          * `support` - Support
+          * `admin` - Admin
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
+      - in: query
+        name: verified
+        schema:
+          type: boolean
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+    post:
+      operationId: users_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/users/{id}/:
+    get:
+      operationId: users_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: users_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: users_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: users_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this user.
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/users/me/:
+    get:
+      operationId: users_me_retrieve
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+    patch:
+      operationId: users_me_partial_update
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedProfile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Profile'
+          description: ''
+components:
+  schemas:
+    Address:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        city_name:
+          type: string
+          readOnly: true
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        instructions:
+          type: string
+        label:
+          type: string
+          maxLength: 80
+        contact_name:
+          type: string
+          maxLength: 160
+        phone:
+          type: string
+          maxLength: 24
+        address:
+          type: string
+        is_default:
+          type: boolean
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        city:
+          type: integer
+      required:
+      - address
+      - city
+      - city_name
+      - id
+      - is_default
+      - label
+      - user
+    Approval:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ApprovalTypeEnum'
+        reason:
+          type: string
+      required:
+      - type
+    ApprovalStatusEnum:
+      enum:
+      - pending
+      - approved
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `approved` - Approved
+        * `rejected` - Rejected
+    ApprovalTypeEnum:
+      enum:
+      - rider
+      - carrier
+      type: string
+      description: |-
+        * `rider` - rider
+        * `carrier` - carrier
+    Assignment:
+      type: object
+      properties:
+        trip:
+          type: integer
+        carrier:
+          type: integer
+        rider:
+          type: integer
+    Attempt:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        outcome:
+          $ref: '#/components/schemas/OutcomeEnum'
+        note:
+          type: string
+        next_action:
+          $ref: '#/components/schemas/NextActionEnum'
+        scheduled_at:
+          type: string
+          format: date-time
+          nullable: true
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        parcel:
+          type: integer
+        rider:
+          type: integer
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - next_action
+      - note
+      - outcome
+      - parcel
+      - rider
+    Audit:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        actor_name:
+          type: string
+          readOnly: true
+          default: System
+        action:
+          type: string
+          maxLength: 80
+        target:
+          type: string
+          maxLength: 120
+        reason:
+          type: string
+        before: {}
+        after: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actor:
+          type: integer
+          nullable: true
+      required:
+      - action
+      - actor_name
+      - created_at
+      - id
+      - target
+    Availability:
+      type: object
+      properties:
+        available:
+          type: boolean
+      required:
+      - available
+    BlankEnum:
+      enum:
+      - ''
+    Carrier:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        document:
+          type: string
+          format: uri
+        user_detail:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        suspended:
+          type: boolean
+          readOnly: true
+        document_expires_at:
+          type: string
+          format: date
+          nullable: true
+        reverification_required:
+          type: boolean
+          readOnly: true
+        vehicle_registration:
+          type: string
+          maxLength: 32
+        capacity_m3:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,4})?$
+          nullable: true
+        review_note:
+          type: string
+          readOnly: true
+        vehicle_type:
+          type: string
+          maxLength: 80
+        licence_no:
+          type: string
+          maxLength: 80
+        capacity_kg:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApprovalStatusEnum'
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - capacity_kg
+      - document
+      - id
+      - licence_no
+      - reverification_required
+      - review_note
+      - status
+      - suspended
+      - user
+      - user_detail
+      - vehicle_type
+    Case:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        parcel_code:
+          type: string
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        kind:
+          $ref: '#/components/schemas/KindEnum'
+        status:
+          allOf:
+          - $ref: '#/components/schemas/CaseStatusEnum'
+          readOnly: true
+        reason:
+          type: string
+        fee:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        decision_note:
+          type: string
+          readOnly: true
+        payment_reference:
+          type: string
+          readOnly: true
+        policy_snapshot:
+          readOnly: true
+        return_stage:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        parcel:
+          type: integer
+        requested_by:
+          type: integer
+          readOnly: true
+        assigned_to:
+          type: integer
+          readOnly: true
+          nullable: true
+        return_trip:
+          type: integer
+          readOnly: true
+          nullable: true
+        return_rider:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - assigned_to
+      - created_at
+      - decision_note
+      - fee
+      - id
+      - kind
+      - parcel
+      - parcel_code
+      - payment_reference
+      - policy_snapshot
+      - reason
+      - requested_by
+      - return_rider
+      - return_stage
+      - return_trip
+      - status
+      - updated_at
+    CaseStatusEnum:
+      enum:
+      - requested
+      - approved
+      - rejected
+      - in_progress
+      - paid
+      - resolved
+      type: string
+      description: |-
+        * `requested` - Requested
+        * `approved` - Approved
+        * `rejected` - Rejected
+        * `in_progress` - In progress
+        * `paid` - Paid
+        * `resolved` - Resolved
+    ChannelEnum:
+      enum:
+      - sms
+      - push
+      type: string
+      description: |-
+        * `sms` - SMS
+        * `push` - Push
+    ChoiceEnum:
+      enum:
+      - station
+      - home
+      type: string
+      description: |-
+        * `station` - station
+        * `home` - home
+    City:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        province:
+          type: string
+          maxLength: 100
+      required:
+      - id
+      - name
+      - province
+    CodeRequest:
+      type: object
+      properties:
+        to_status:
+          $ref: '#/components/schemas/ParcelStatusEnum'
+      required:
+      - to_status
+    CurrencyEnum:
+      enum:
+      - USD
+      type: string
+      description: '* `USD` - USD'
+    Decision:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/DecisionActionEnum'
+        note:
+          type: string
+          maxLength: 2000
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        reference:
+          type: string
+          maxLength: 120
+        reconciliation_reference:
+          type: string
+          maxLength: 120
+      required:
+      - action
+      - note
+    DecisionActionEnum:
+      enum:
+      - approve
+      - reject
+      - pay
+      - resolve
+      type: string
+      description: |-
+        * `approve` - approve
+        * `reject` - reject
+        * `pay` - pay
+        * `resolve` - resolve
+    Delivery:
+      type: object
+      properties:
+        choice:
+          $ref: '#/components/schemas/ChoiceEnum'
+        address:
+          type: string
+          default: ''
+      required:
+      - choice
+    DeliveryChoiceEnum:
+      enum:
+      - station
+      - home
+      type: string
+      description: |-
+        * `station` - Station collection
+        * `home` - Home delivery
+    Evidence:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        photo:
+          type: string
+          format: uri
+        condition:
+          $ref: '#/components/schemas/EvidenceConditionEnum'
+        note:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        parcel:
+          type: integer
+        case:
+          type: integer
+          nullable: true
+        event:
+          type: integer
+          nullable: true
+        uploaded_by:
+          type: integer
+          readOnly: true
+      required:
+      - condition
+      - created_at
+      - id
+      - parcel
+      - photo
+      - uploaded_by
+    EvidenceConditionEnum:
+      enum:
+      - intact
+      - damaged
+      - missing
+      - packaging
+      type: string
+      description: |-
+        * `intact` - Intact
+        * `damaged` - Damaged
+        * `missing` - Contents missing
+        * `packaging` - Packaging concern
+    ExceptionResolution:
+      type: object
+      properties:
+        resolution:
+          $ref: '#/components/schemas/ResolutionEnum'
+        otp:
+          type: string
+          pattern: ^\d{6}$
+        note:
+          type: string
+      required:
+      - note
+      - otp
+      - resolution
+    FinanceEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        action:
+          type: string
+          maxLength: 50
+        reference:
+          type: string
+          maxLength: 100
+        details: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        actor:
+          type: integer
+      required:
+      - action
+      - actor
+      - created_at
+      - id
+      - reference
+    FraudReview:
+      type: object
+      properties:
+        note:
+          type: string
+          maxLength: 2000
+      required:
+      - note
+    Handover:
+      type: object
+      properties:
+        photo:
+          type: string
+          format: uri
+          nullable: true
+        to_status:
+          $ref: '#/components/schemas/ParcelStatusEnum'
+        otp:
+          type: string
+          pattern: ^\d{6}$
+        note:
+          type: string
+          default: ''
+      required:
+      - otp
+      - to_status
+    KindEnum:
+      enum:
+      - cancellation
+      - return
+      - failed_delivery
+      - refund
+      - loss
+      - damage
+      - delay
+      - payment
+      type: string
+      description: |-
+        * `cancellation` - Cancellation
+        * `return` - Return to sender
+        * `failed_delivery` - Failed delivery
+        * `refund` - Refund
+        * `loss` - Loss claim
+        * `damage` - Damage claim
+        * `delay` - Delay
+        * `payment` - Payment problem
+    LegEnum:
+      enum:
+      - first_mile
+      - last_mile
+      type: string
+      description: |-
+        * `` - Legacy/route
+        * `first_mile` - First mile
+        * `last_mile` - Last mile
+    LocationResult:
+      type: object
+      properties:
+        display_name:
+          type: string
+        latitude:
+          type: string
+        longitude:
+          type: string
+      required:
+      - display_name
+      - latitude
+      - longitude
+    MethodEnum:
+      enum:
+      - mobile_money
+      - cash
+      - bank_transfer
+      type: string
+      description: |-
+        * `mobile_money` - mobile_money
+        * `cash` - cash
+        * `bank_transfer` - bank_transfer
+    NextActionEnum:
+      enum:
+      - retry
+      - contact
+      - return
+      type: string
+      description: |-
+        * `retry` - Retry
+        * `contact` - Contact recipient
+        * `return` - Return to sender
+    Note:
+      type: object
+      properties:
+        note:
+          type: string
+          maxLength: 2000
+      required:
+      - note
+    Notification:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        parcel_code:
+          type: string
+          readOnly: true
+        message:
+          type: string
+        read_at:
+          type: string
+          format: date-time
+          nullable: true
+        channel:
+          allOf:
+          - $ref: '#/components/schemas/ChannelEnum'
+          readOnly: true
+        trigger_event:
+          type: string
+          readOnly: true
+        recipient_phone:
+          type: string
+          readOnly: true
+        sent_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        status:
+          type: string
+          readOnly: true
+        parcel:
+          type: integer
+          readOnly: true
+      required:
+      - channel
+      - id
+      - parcel
+      - parcel_code
+      - recipient_phone
+      - sent_at
+      - status
+      - trigger_event
+    NotificationsEnum:
+      enum:
+      - booked
+      - picked_up
+      - at_origin_station
+      - in_transit
+      - at_destination_station
+      - out_for_delivery
+      - delivered
+      - exception
+      - returned
+      - cancelled
+      - failed_delivery
+      - case_updated
+      type: string
+      description: |-
+        * `booked` - booked
+        * `picked_up` - picked_up
+        * `at_origin_station` - at_origin_station
+        * `in_transit` - in_transit
+        * `at_destination_station` - at_destination_station
+        * `out_for_delivery` - out_for_delivery
+        * `delivered` - delivered
+        * `exception` - exception
+        * `returned` - returned
+        * `cancelled` - cancelled
+        * `failed_delivery` - failed_delivery
+        * `case_updated` - case_updated
+    OperationalPolicy:
+      type: object
+      properties:
+        version:
+          type: string
+          maxLength: 40
+        reviewed:
+          type: boolean
+        currency:
+          $ref: '#/components/schemas/CurrencyEnum'
+        terms:
+          type: string
+          maxLength: 10000
+        insurance_available:
+          type: boolean
+        cancellation_before_pickup:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        cancellation_assigned:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        cancellation_after_pickup:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        return_fee:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        liability_limit:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        max_length_cm:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        max_width_cm:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        max_height_cm:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        max_volume_m3:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,4})?$
+          nullable: true
+        dimensions_required:
+          type: boolean
+        max_delivery_attempts:
+          type: integer
+          maximum: 20
+          minimum: 1
+        stale_after_hours:
+          type: integer
+          maximum: 8760
+          minimum: 1
+        prohibited_categories:
+          type: array
+          items:
+            type: string
+            maxLength: 40
+          maxItems: 100
+        restricted_categories:
+          type: array
+          items:
+            type: string
+            maxLength: 40
+          maxItems: 100
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/NotificationsEnum'
+          maxItems: 30
+      required:
+      - cancellation_after_pickup
+      - cancellation_assigned
+      - cancellation_before_pickup
+      - currency
+      - dimensions_required
+      - insurance_available
+      - liability_limit
+      - max_delivery_attempts
+      - max_height_cm
+      - max_length_cm
+      - max_volume_m3
+      - max_width_cm
+      - notifications
+      - prohibited_categories
+      - restricted_categories
+      - return_fee
+      - reviewed
+      - stale_after_hours
+      - terms
+      - version
+    OutcomeEnum:
+      enum:
+      - unavailable
+      - incorrect_address
+      - refused
+      - unreachable
+      type: string
+      description: |-
+        * `unavailable` - Recipient unavailable
+        * `incorrect_address` - Incorrect address
+        * `refused` - Refused
+        * `unreachable` - Unreachable
+    Override:
+      type: object
+      properties:
+        note:
+          type: string
+          maxLength: 2000
+        restore_previous_status:
+          type: boolean
+        recipient_name:
+          type: string
+          maxLength: 160
+        recipient_phone:
+          type: string
+          pattern: ^\+263\d{9}$
+        delivery_address:
+          type: string
+        location_instructions:
+          type: string
+        origin_station:
+          type: integer
+        destination_station:
+          type: integer
+      required:
+      - note
+    PaginatedAddressList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Address'
+    PaginatedAttemptList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Attempt'
+    PaginatedAuditList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Audit'
+    PaginatedCarrierList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Carrier'
+    PaginatedCaseList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Case'
+    PaginatedCityList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/City'
+    PaginatedEvidenceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Evidence'
+    PaginatedFinanceEventList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinanceEvent'
+    PaginatedNotificationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Notification'
+    PaginatedParcelList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Parcel'
+    PaginatedPaymentList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+    PaginatedPayoutList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payout'
+    PaginatedPilotList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pilot'
+    PaginatedRateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rate'
+    PaginatedRiderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rider'
+    PaginatedSettingsList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Settings'
+    PaginatedStationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Station'
+    PaginatedStatusEventList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusEvent'
+    PaginatedSupportTicketList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/SupportTicket'
+    PaginatedTaskList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Task'
+    PaginatedTripList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trip'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    Parcel:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        photo:
+          type: string
+          format: uri
+        weight_band:
+          $ref: '#/components/schemas/WeightBandEnum'
+        recipient_phone:
+          type: string
+          pattern: ^\+263[0-9]{9}$
+        sender_phone:
+          oneOf:
+          - type: string
+            pattern: ^\+263[0-9]{9}$
+          - type: string
+            maxLength: 0
+        payment:
+          type: object
+          additionalProperties: {}
+          nullable: true
+          readOnly: true
+        sender_detail:
+          allOf:
+          - $ref: '#/components/schemas/Profile'
+          readOnly: true
+        next_steps:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/StatusEvent'
+          readOnly: true
+        origin_station_detail:
+          allOf:
+          - $ref: '#/components/schemas/Station'
+          readOnly: true
+        destination_station_detail:
+          allOf:
+          - $ref: '#/components/schemas/Station'
+          readOnly: true
+        description:
+          type: string
+          maxLength: 500
+        contents_category:
+          type: string
+          maxLength: 40
+        declared_value:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        length_cm:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        width_cm:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        height_cm:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,6}(?:\.\d{0,2})?$
+          nullable: true
+        pickup_latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        pickup_longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        delivery_latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        delivery_longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        location_instructions:
+          type: string
+        policy_snapshot:
+          readOnly: true
+        duplicate_fingerprint:
+          type: string
+          readOnly: true
+        pickup_address:
+          type: string
+        sender_name:
+          type: string
+          maxLength: 160
+        otp_expires_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        otp_target:
+          type: string
+          readOnly: true
+        otp_attempts:
+          type: integer
+          readOnly: true
+        notes:
+          type: string
+        delivery_choice:
+          $ref: '#/components/schemas/DeliveryChoiceEnum'
+        delivery_address:
+          type: string
+        code:
+          type: string
+          readOnly: true
+        recipient_name:
+          type: string
+          maxLength: 160
+        recipient_access_token:
+          type: string
+          readOnly: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ParcelStatusEnum'
+          readOnly: true
+        handover_otp:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        booked_by:
+          type: integer
+          readOnly: true
+          nullable: true
+        trip:
+          type: integer
+          readOnly: true
+          nullable: true
+        sender:
+          type: integer
+          readOnly: true
+        origin_station:
+          type: integer
+        destination_station:
+          type: integer
+        current_holder:
+          type: integer
+          readOnly: true
+          nullable: true
+        assigned_carrier:
+          type: integer
+          readOnly: true
+          nullable: true
+        assigned_rider:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - assigned_carrier
+      - assigned_rider
+      - booked_by
+      - code
+      - created_at
+      - current_holder
+      - destination_station
+      - destination_station_detail
+      - duplicate_fingerprint
+      - events
+      - handover_otp
+      - id
+      - next_steps
+      - origin_station
+      - origin_station_detail
+      - otp_attempts
+      - otp_expires_at
+      - otp_target
+      - payment
+      - photo
+      - policy_snapshot
+      - price
+      - recipient_access_token
+      - recipient_name
+      - recipient_phone
+      - sender
+      - sender_detail
+      - status
+      - trip
+      - weight_band
+    ParcelStatusEnum:
+      enum:
+      - booked
+      - picked_up
+      - at_origin_station
+      - in_transit
+      - at_destination_station
+      - out_for_delivery
+      - delivered
+      - exception
+      - returned
+      - cancelled
+      type: string
+      description: |-
+        * `booked` - Booked
+        * `picked_up` - Picked up
+        * `at_origin_station` - At origin station
+        * `in_transit` - In transit
+        * `at_destination_station` - At destination station
+        * `out_for_delivery` - Out for delivery
+        * `delivered` - Delivered
+        * `exception` - Exception
+        * `returned` - Returned
+        * `cancelled` - Cancelled
+    PatchedAddress:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        city_name:
+          type: string
+          readOnly: true
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        instructions:
+          type: string
+        label:
+          type: string
+          maxLength: 80
+        contact_name:
+          type: string
+          maxLength: 160
+        phone:
+          type: string
+          maxLength: 24
+        address:
+          type: string
+        is_default:
+          type: boolean
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+        city:
+          type: integer
+    PatchedCarrier:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        document:
+          type: string
+          format: uri
+        user_detail:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        suspended:
+          type: boolean
+          readOnly: true
+        document_expires_at:
+          type: string
+          format: date
+          nullable: true
+        reverification_required:
+          type: boolean
+          readOnly: true
+        vehicle_registration:
+          type: string
+          maxLength: 32
+        capacity_m3:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,4})?$
+          nullable: true
+        review_note:
+          type: string
+          readOnly: true
+        vehicle_type:
+          type: string
+          maxLength: 80
+        licence_no:
+          type: string
+          maxLength: 80
+        capacity_kg:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApprovalStatusEnum'
+          readOnly: true
+        user:
+          type: integer
+          readOnly: true
+    PatchedCity:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        province:
+          type: string
+          maxLength: 100
+    PatchedPilot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        origin_name:
+          type: string
+          readOnly: true
+        destination_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        active:
+          type: boolean
+        origin_city:
+          type: integer
+        destination_city:
+          type: integer
+    PatchedProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        phone:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 160
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          readOnly: true
+        verified:
+          type: boolean
+          readOnly: true
+        operational_permissions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+    PatchedRate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        origin_name:
+          type: string
+          readOnly: true
+        destination_name:
+          type: string
+          readOnly: true
+        station_name:
+          type: string
+          readOnly: true
+        weight_band:
+          type: string
+          maxLength: 32
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        origin_city:
+          type: integer
+        destination_city:
+          type: integer
+        station_override:
+          type: integer
+          nullable: true
+    PatchedRider:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        document:
+          type: string
+          format: uri
+        home_station_name:
+          type: string
+          readOnly: true
+        user_detail:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        suspended:
+          type: boolean
+          readOnly: true
+        document_expires_at:
+          type: string
+          format: date
+          nullable: true
+        reverification_required:
+          type: boolean
+          readOnly: true
+        review_note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApprovalStatusEnum'
+          readOnly: true
+        available:
+          type: boolean
+        user:
+          type: integer
+          readOnly: true
+        home_station:
+          type: integer
+    PatchedSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          maxLength: 80
+        value: {}
+    PatchedStation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        city_name:
+          type: string
+          readOnly: true
+        contact_phone:
+          type: string
+          maxLength: 24
+        opening_hours: {}
+        service_status:
+          $ref: '#/components/schemas/ServiceStatusEnum'
+        holding_capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        name:
+          type: string
+          maxLength: 140
+        address:
+          type: string
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        active:
+          type: boolean
+        payment_number:
+          type: string
+          maxLength: 32
+        city:
+          type: integer
+        operator:
+          type: integer
+    PatchedTrip:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carrier_name:
+          type: string
+          readOnly: true
+        origin_name:
+          type: string
+          readOnly: true
+        destination_name:
+          type: string
+          readOnly: true
+        remaining_kg:
+          type: string
+          readOnly: true
+        remaining_m3:
+          type: string
+          nullable: true
+          readOnly: true
+        capacity_m3:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,4})?$
+          nullable: true
+        vehicle_registration:
+          type: string
+          maxLength: 32
+        departure_at:
+          type: string
+          format: date-time
+        capacity_kg:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        active:
+          type: boolean
+        carrier:
+          type: integer
+        origin_city:
+          type: integer
+        destination_city:
+          type: integer
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 24
+        name:
+          type: string
+          maxLength: 160
+        role:
+          $ref: '#/components/schemas/UserRoleEnum'
+        verified:
+          type: boolean
+          readOnly: true
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        operational_permissions:
+          type: array
+          items:
+            type: string
+    Payment:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        parcel_code:
+          type: string
+          readOnly: true
+        receipt_sha256:
+          type: string
+          readOnly: true
+        fraud_flags:
+          readOnly: true
+        transaction_reference:
+          type: string
+          maxLength: 120
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        method:
+          type: string
+          maxLength: 40
+        receipt_photo:
+          type: string
+          format: uri
+          nullable: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/PaymentStatusEnum'
+          readOnly: true
+        verified_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        parcel:
+          type: integer
+        verified_by:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - amount
+      - fraud_flags
+      - id
+      - parcel
+      - parcel_code
+      - receipt_sha256
+      - status
+      - verified_at
+      - verified_by
+    PaymentDecision:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/PaymentDecisionStatusEnum'
+      required:
+      - status
+    PaymentDecisionStatusEnum:
+      enum:
+      - verified
+      - rejected
+      type: string
+      description: |-
+        * `verified` - verified
+        * `rejected` - rejected
+    PaymentRecord:
+      type: object
+      properties:
+        method:
+          allOf:
+          - $ref: '#/components/schemas/MethodEnum'
+          default: mobile_money
+        receipt_photo:
+          type: string
+          format: uri
+        transaction_reference:
+          type: string
+          maxLength: 120
+      required:
+      - receipt_photo
+    PaymentStatusEnum:
+      enum:
+      - pending
+      - verified
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `verified` - Verified
+        * `rejected` - Rejected
+    Payout:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        beneficiary_name:
+          type: string
+          readOnly: true
+        parcel_code:
+          type: string
+          readOnly: true
+        leg:
+          default: ''
+          oneOf:
+          - $ref: '#/components/schemas/LegEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        approved_at:
+          type: string
+          format: date-time
+          nullable: true
+        disbursed_at:
+          type: string
+          format: date-time
+          nullable: true
+        payment_reference:
+          type: string
+          maxLength: 120
+        recipient:
+          $ref: '#/components/schemas/RecipientEnum'
+        period:
+          type: string
+          maxLength: 20
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        status:
+          type: string
+          maxLength: 20
+        statement_url:
+          oneOf:
+          - type: string
+            format: uri
+            maxLength: 200
+          - type: string
+            maxLength: 0
+        beneficiary:
+          type: integer
+          nullable: true
+        approved_by:
+          type: integer
+          nullable: true
+        parcel:
+          type: integer
+      required:
+      - amount
+      - beneficiary_name
+      - id
+      - parcel
+      - parcel_code
+      - period
+      - recipient
+    PayoutRun:
+      type: object
+      properties:
+        parcel:
+          type: integer
+        period:
+          type: string
+          pattern: ^\d{4}-(0[1-9]|1[0-2])$
+        rider:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+          default: '0.00'
+        first_mile_rider:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        last_mile_rider:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        carrier:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        station:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+      required:
+      - carrier
+      - parcel
+      - period
+      - station
+    PhoneRequest:
+      type: object
+      properties:
+        phone:
+          type: string
+          pattern: ^\+263[0-9]{9}$
+        name:
+          type: string
+          maxLength: 160
+        role:
+          allOf:
+          - $ref: '#/components/schemas/RegistrationRoleEnum'
+          default: customer
+      required:
+      - name
+      - phone
+    PhoneVerify:
+      type: object
+      properties:
+        challenge_id:
+          type: integer
+          minimum: 1
+        code:
+          type: string
+          pattern: ^\d{6}$
+      required:
+      - challenge_id
+      - code
+    Pilot:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        origin_name:
+          type: string
+          readOnly: true
+        destination_name:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 120
+        active:
+          type: boolean
+        origin_city:
+          type: integer
+        destination_city:
+          type: integer
+      required:
+      - destination_city
+      - destination_name
+      - id
+      - name
+      - origin_city
+      - origin_name
+    Profile:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          readOnly: true
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+        phone:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          maxLength: 160
+        role:
+          allOf:
+          - $ref: '#/components/schemas/UserRoleEnum'
+          readOnly: true
+        verified:
+          type: boolean
+          readOnly: true
+        operational_permissions:
+          type: array
+          items:
+            type: string
+          readOnly: true
+      required:
+      - id
+      - name
+      - operational_permissions
+      - phone
+      - role
+      - username
+      - verified
+    PublicEvent:
+      type: object
+      properties:
+        to_status:
+          type: string
+          maxLength: 32
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - timestamp
+      - to_status
+    PublicParcel:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 6
+        recipient_name:
+          type: string
+          maxLength: 160
+        status:
+          $ref: '#/components/schemas/ParcelStatusEnum'
+        destination_station:
+          allOf:
+          - $ref: '#/components/schemas/PublicStation'
+          readOnly: true
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicEvent'
+          readOnly: true
+        delivery_choice:
+          $ref: '#/components/schemas/DeliveryChoiceEnum'
+        delivery_address:
+          type: string
+      required:
+      - code
+      - destination_station
+      - events
+      - recipient_name
+    PublicStation:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 140
+        address:
+          type: string
+        city:
+          type: integer
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+      required:
+      - address
+      - city
+      - id
+      - name
+    Rate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        origin_name:
+          type: string
+          readOnly: true
+        destination_name:
+          type: string
+          readOnly: true
+        station_name:
+          type: string
+          readOnly: true
+        weight_band:
+          type: string
+          maxLength: 32
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        origin_city:
+          type: integer
+        destination_city:
+          type: integer
+        station_override:
+          type: integer
+          nullable: true
+      required:
+      - destination_city
+      - destination_name
+      - id
+      - origin_city
+      - origin_name
+      - price
+      - station_name
+      - weight_band
+    Reason:
+      type: object
+      properties:
+        note:
+          type: string
+          maxLength: 2000
+        action:
+          $ref: '#/components/schemas/ReasonActionEnum'
+      required:
+      - action
+      - note
+    ReasonActionEnum:
+      enum:
+      - suspend
+      - reactivate
+      - reverify
+      type: string
+      description: |-
+        * `suspend` - suspend
+        * `reactivate` - reactivate
+        * `reverify` - reverify
+    RecipientEnum:
+      enum:
+      - rider
+      - carrier
+      - station
+      - platform
+      type: string
+      description: |-
+        * `rider` - Rider
+        * `carrier` - Carrier
+        * `station` - Station
+        * `platform` - Platform
+    RegistrationRoleEnum:
+      enum:
+      - customer
+      - rider
+      - carrier
+      type: string
+      description: |-
+        * `customer` - customer
+        * `rider` - rider
+        * `carrier` - carrier
+    Reply:
+      type: object
+      properties:
+        body:
+          type: string
+          maxLength: 5000
+      required:
+      - body
+    ResolutionEnum:
+      enum:
+      - return
+      type: string
+      description: '* `return` - return'
+    Return:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/ReturnActionEnum'
+        note:
+          type: string
+          maxLength: 2000
+        trip:
+          type: integer
+        rider:
+          type: integer
+        otp:
+          type: string
+          pattern: ^\d{6}$
+        photo:
+          type: string
+          format: uri
+          nullable: true
+        condition:
+          allOf:
+          - $ref: '#/components/schemas/ReturnConditionEnum'
+          default: intact
+      required:
+      - action
+      - note
+    ReturnActionEnum:
+      enum:
+      - assign
+      - code
+      - confirm
+      type: string
+      description: |-
+        * `assign` - assign
+        * `code` - code
+        * `confirm` - confirm
+    ReturnConditionEnum:
+      enum:
+      - intact
+      - damaged
+      - missing_packaging
+      type: string
+      description: |-
+        * `intact` - intact
+        * `damaged` - damaged
+        * `missing_packaging` - missing_packaging
+    Rider:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        document:
+          type: string
+          format: uri
+        home_station_name:
+          type: string
+          readOnly: true
+        user_detail:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+        suspended:
+          type: boolean
+          readOnly: true
+        document_expires_at:
+          type: string
+          format: date
+          nullable: true
+        reverification_required:
+          type: boolean
+          readOnly: true
+        review_note:
+          type: string
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/ApprovalStatusEnum'
+          readOnly: true
+        available:
+          type: boolean
+        user:
+          type: integer
+          readOnly: true
+        home_station:
+          type: integer
+      required:
+      - document
+      - home_station
+      - home_station_name
+      - id
+      - reverification_required
+      - review_note
+      - status
+      - suspended
+      - user
+      - user_detail
+    ServiceStatusEnum:
+      enum:
+      - open
+      - limited
+      - closed
+      type: string
+      description: |-
+        * `open` - Open
+        * `limited` - Limited
+        * `closed` - Closed
+    Settings:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        key:
+          type: string
+          maxLength: 80
+        value: {}
+      required:
+      - id
+      - key
+    Settlement:
+      type: object
+      properties:
+        action:
+          $ref: '#/components/schemas/SettlementActionEnum'
+        reference:
+          type: string
+          maxLength: 120
+      required:
+      - action
+    SettlementActionEnum:
+      enum:
+      - approve
+      - disburse
+      type: string
+      description: |-
+        * `approve` - approve
+        * `disburse` - disburse
+    Station:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        city_name:
+          type: string
+          readOnly: true
+        contact_phone:
+          type: string
+          maxLength: 24
+        opening_hours: {}
+        service_status:
+          $ref: '#/components/schemas/ServiceStatusEnum'
+        holding_capacity:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          nullable: true
+        name:
+          type: string
+          maxLength: 140
+        address:
+          type: string
+        latitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        longitude:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,6})?$
+          nullable: true
+        active:
+          type: boolean
+        payment_number:
+          type: string
+          maxLength: 32
+        city:
+          type: integer
+        operator:
+          type: integer
+      required:
+      - address
+      - city
+      - city_name
+      - id
+      - name
+      - operator
+      - payment_number
+    StatusEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        parcel_code:
+          type: string
+          readOnly: true
+        released_by_name:
+          type: string
+          readOnly: true
+          default: Sender
+        received_by_name:
+          type: string
+          readOnly: true
+          default: Recipient
+        actor_name:
+          type: string
+          readOnly: true
+        recipient_confirmed:
+          type: boolean
+        from_status:
+          type: string
+          readOnly: true
+        to_status:
+          type: string
+          readOnly: true
+        note:
+          type: string
+          readOnly: true
+        otp_used:
+          type: boolean
+          readOnly: true
+        accepted:
+          type: boolean
+          readOnly: true
+        timestamp:
+          type: string
+          format: date-time
+          readOnly: true
+        released_by:
+          type: integer
+          nullable: true
+        received_by:
+          type: integer
+          nullable: true
+        parcel:
+          type: integer
+          readOnly: true
+        actor:
+          type: integer
+          readOnly: true
+          nullable: true
+      required:
+      - accepted
+      - actor
+      - actor_name
+      - from_status
+      - id
+      - note
+      - otp_used
+      - parcel
+      - parcel_code
+      - received_by_name
+      - released_by_name
+      - timestamp
+      - to_status
+    SupportTicket:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        parcel_code:
+          type: string
+          writeOnly: true
+        subject:
+          type: string
+          maxLength: 200
+        status:
+          type: string
+          readOnly: true
+        messages: {}
+        external_reference:
+          type: string
+          readOnly: true
+        received_after_hours:
+          type: boolean
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        raised_by:
+          type: integer
+          readOnly: true
+        parcel:
+          type: integer
+          nullable: true
+      required:
+      - created_at
+      - external_reference
+      - id
+      - raised_by
+      - received_after_hours
+      - status
+      - subject
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        parcel_detail:
+          allOf:
+          - $ref: '#/components/schemas/Parcel'
+          readOnly: true
+        type:
+          $ref: '#/components/schemas/TaskTypeEnum'
+        status:
+          $ref: '#/components/schemas/TaskStatusEnum'
+        proof_photo:
+          type: string
+          format: uri
+          nullable: true
+        signature:
+          type: string
+          format: uri
+          nullable: true
+        parcel:
+          type: integer
+        assigned_to:
+          type: integer
+      required:
+      - assigned_to
+      - id
+      - parcel
+      - parcel_detail
+      - type
+    TaskCompletion:
+      type: object
+      properties:
+        to_status:
+          $ref: '#/components/schemas/ParcelStatusEnum'
+        otp:
+          type: string
+          pattern: ^\d{6}$
+        proof_photo:
+          type: string
+          format: uri
+          nullable: true
+        signature:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - otp
+      - to_status
+    TaskStatusEnum:
+      enum:
+      - offered
+      - accepted
+      - declined
+      - completed
+      type: string
+      description: |-
+        * `offered` - Offered
+        * `accepted` - Accepted
+        * `declined` - Declined
+        * `completed` - Completed
+    TaskTypeEnum:
+      enum:
+      - first_mile_pickup
+      - inter_town_transport
+      - last_mile_delivery
+      type: string
+      description: |-
+        * `first_mile_pickup` - First-mile pickup
+        * `inter_town_transport` - Inter-town transport
+        * `last_mile_delivery` - Last-mile delivery
+    TicketStatus:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/TicketStatusStatusEnum'
+      required:
+      - status
+    TicketStatusStatusEnum:
+      enum:
+      - open
+      - waiting_customer
+      - resolved
+      - closed
+      type: string
+      description: |-
+        * `open` - open
+        * `waiting_customer` - waiting_customer
+        * `resolved` - resolved
+        * `closed` - closed
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    Trip:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        carrier_name:
+          type: string
+          readOnly: true
+        origin_name:
+          type: string
+          readOnly: true
+        destination_name:
+          type: string
+          readOnly: true
+        remaining_kg:
+          type: string
+          readOnly: true
+        remaining_m3:
+          type: string
+          nullable: true
+          readOnly: true
+        capacity_m3:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,5}(?:\.\d{0,4})?$
+          nullable: true
+        vehicle_registration:
+          type: string
+          maxLength: 32
+        departure_at:
+          type: string
+          format: date-time
+        capacity_kg:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,7}(?:\.\d{0,2})?$
+        active:
+          type: boolean
+        carrier:
+          type: integer
+        origin_city:
+          type: integer
+        destination_city:
+          type: integer
+      required:
+      - capacity_kg
+      - carrier
+      - carrier_name
+      - departure_at
+      - destination_city
+      - destination_name
+      - id
+      - origin_city
+      - origin_name
+      - remaining_kg
+      - remaining_m3
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        phone:
+          type: string
+          maxLength: 24
+        name:
+          type: string
+          maxLength: 160
+        role:
+          $ref: '#/components/schemas/UserRoleEnum'
+        verified:
+          type: boolean
+          readOnly: true
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        password:
+          type: string
+          writeOnly: true
+          minLength: 8
+        operational_permissions:
+          type: array
+          items:
+            type: string
+      required:
+      - id
+      - name
+      - phone
+      - username
+      - verified
+    UserRoleEnum:
+      enum:
+      - customer
+      - rider
+      - carrier
+      - station_operator
+      - ops
+      - finance
+      - support
+      - admin
+      type: string
+      description: |-
+        * `customer` - Customer
+        * `rider` - Rider
+        * `carrier` - Carrier
+        * `station_operator` - Station operator
+        * `ops` - Ops
+        * `finance` - Finance
+        * `support` - Support
+        * `admin` - Admin
+    WeightBandEnum:
+      enum:
+      - 0-2kg
+      - 2-5kg
+      - 5-10kg
+      type: string
+      description: |-
+        * `0-2kg` - 0-2kg
+        * `2-5kg` - 2-5kg
+        * `5-10kg` - 5-10kg
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

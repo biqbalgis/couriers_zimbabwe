@@ -1,0 +1,262 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pano Logistics Workflows Document</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#24392f;font:16px/1.65 Arial,Helvetica,sans-serif}.toolbar{background:#102f28;color:white;padding:16px 24px;display:flex;flex-wrap:wrap;gap:18px}.toolbar a{color:white;font-size:14px}.document{max-width:1120px;margin:32px auto;padding:48px 56px;background:white;border:1px solid #e0e8e3;border-radius:12px}h1,h2,h3{color:#000;line-height:1.25;scroll-margin-top:24px}h1{font-size:36px}h2{font-size:25px;margin-top:40px;border-bottom:1px solid #e0e8e3;padding-bottom:10px}h3{font-size:19px;margin-top:28px}a{color:#146c56}code{font:13px Consolas,monospace;overflow-wrap:anywhere}pre{background:#f5f7f5;padding:18px;border:1px solid #e0e8e3;border-radius:6px;overflow:auto}.table-wrap{overflow-x:auto;margin:20px 0}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.5}th,td{border:1px solid #d9d9d9;padding:10px 12px;text-align:left;vertical-align:middle;overflow-wrap:anywhere}th{background:#eaf0ec;color:black}tr:nth-child(even) td{background:#fafcfb}figure{margin:24px 0}figure svg{width:100%;height:auto;display:block}figcaption,footer{font-size:13px;color:#62766d}li{margin:6px 0}details{margin:16px 0}summary{cursor:pointer}footer{border-top:1px solid #e0e8e3;margin-top:40px;padding-top:16px}@media(max-width:700px){.document{margin:12px;padding:24px 18px}h1{font-size:28px}table{font-size:12px}}@media print{@page{size:A4;margin:18mm}.toolbar{display:none}body{background:white;font-size:10.5pt}.document{border:0;margin:0;padding:0;max-width:none}h1{font-size:25pt}h2{font-size:17pt;break-after:avoid}h3{font-size:13pt;break-after:avoid}table{font-size:8.5pt}thead{display:table-header-group}tr,figure{break-inside:avoid}.table-wrap{overflow:visible}pre{white-space:pre-wrap;overflow-wrap:anywhere}details{display:none}}</style></head><body><nav class="toolbar" aria-label="Document navigation"><a href="use-cases.html">Use cases</a><a href="workflows.html">Workflows</a><a href="database.html">Database and ER</a><a href="proposal-audit.html">Proposal audit</a><a href="launch-runbook.html">Launch runbook</a><a href="training.html">Training</a></nav><main class="document"><h1 id="pano-logistics-workflows-document">Pano Logistics Workflows Document</h1>
+<p>Version 1.1 · 1 October 2026 · Mutare–Chipinge pilot</p>
+<p>Update · 2 October 2026: <a href="operational-completion.html">Operational completion</a> defines UC27–UC52, including the structured cancellation/return, refund, claim and exception workflows. Its return handover process supersedes direct legacy exception-to-return transitions described below.</p>
+<h2 id="purpose">Purpose</h2>
+<p>This document explains the implemented end-to-end parcel journey and the account, payment, support and recovery processes around it. Operators can use it as a working reference; developers and testers can use the transition table and API references to verify behavior. It describes the current code, including limits, rather than treating proposal requirements as implemented features.</p>
+<p>The browser routes are role-specific views over the same backend records. Django services validate mutations, maintain parcel projections and append custody events. Each custody event also queues replication to a separate archive. Money moves through external payment channels, and provider integration work is queued until a configured adapter processes it.</p>
+<h2 id="main-shipment-journey">Main shipment journey</h2>
+<figure><svg xmlns="http://www.w3.org/2000/svg" width="1100" height="670" viewBox="0 0 1100 670" role="img" aria-label="Parcel journey with station collection and home delivery"><defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L9 4.5L0 9" fill="#146c56"/></marker></defs><rect width="1100" height="670" fill="#fafcfb"/><g font-family="Arial,sans-serif" fill="#102f28"><text x="35" y="35" font-size="24" font-weight="700">Parcel journey</text><text x="35" y="61" font-size="14" fill="#60766e">Mutare–Chipinge in either direction · fresh code at each custody change</text></g><rect x="45" y="110" width="265" height="95" rx="12" fill="white" stroke="#cfdcd5"/><text x="63" y="144" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#102f28">Booked</text><text x="63" y="175" font-family="Arial,sans-serif" font-size="13" fill="#60766e">Sender custody</text><rect x="370" y="110" width="265" height="95" rx="12" fill="white" stroke="#cfdcd5"/><text x="388" y="144" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#102f28">Picked up</text><text x="388" y="175" font-family="Arial,sans-serif" font-size="13" fill="#60766e">Optional first mile</text><rect x="695" y="110" width="265" height="95" rx="12" fill="white" stroke="#cfdcd5"/><text x="713" y="144" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#102f28">At origin station</text><text x="713" y="175" font-family="Arial,sans-serif" font-size="13" fill="#60766e">Origin operator custody</text><rect x="695" y="290" width="265" height="95" rx="12" fill="white" stroke="#cfdcd5"/><text x="713" y="324" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#102f28">In transit</text><text x="713" y="355" font-family="Arial,sans-serif" font-size="13" fill="#60766e">Verified payment required</text><rect x="370" y="290" width="265" height="95" rx="12" fill="white" stroke="#cfdcd5"/><text x="388" y="324" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#102f28">At destination station</text><text x="388" y="355" font-family="Arial,sans-serif" font-size="13" fill="#60766e">Destination operator custody</text><rect x="45" y="470" width="265" height="95" rx="12" fill="white" stroke="#cfdcd5"/><text x="63" y="504" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#102f28">Out for delivery</text><text x="63" y="535" font-family="Arial,sans-serif" font-size="13" fill="#60766e">Assigned rider plus verified receipt</text><rect x="370" y="470" width="265" height="95" rx="12" fill="white" stroke="#cfdcd5"/><text x="388" y="504" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#102f28">Delivered</text><text x="388" y="535" font-family="Arial,sans-serif" font-size="13" fill="#60766e">Recipient confirmation</text><rect x="695" y="470" width="265" height="95" rx="12" fill="white" stroke="#cfdcd5"/><text x="713" y="504" font-family="Arial,sans-serif" font-size="19" font-weight="700" fill="#102f28">Exception or cancelled</text><text x="713" y="535" font-family="Arial,sans-serif" font-size="13" fill="#60766e">See eligibility and return rules</text><g fill="none" stroke="#146c56" stroke-width="2" marker-end="url(#arrow)"><path d="M310 157H366"/><path d="M635 157H691"/><path d="M175 110V85H827V106"/><path d="M827 205V286"/><path d="M695 338H639"/><path d="M500 385V466"/><path d="M370 338H177V466"/><path d="M310 517H366"/></g><g font-family="Arial,sans-serif" font-size="12" fill="#60766e"><text x="320" y="145">Pickup</text><text x="645" y="145">Receipt</text><text x="480" y="80">Direct station drop off</text><text x="840" y="250">Carrier collection</text><text x="640" y="325">Arrival</text><text x="510" y="430">Station collection</text><text x="55" y="420">Home delivery</text><text x="47" y="609">Final home delivery also requires a proof photo and recipient signature.</text><text x="47" y="634">Exceptions can lead to returned. Cancellation is limited to pre-transport shipments without verified payment.</text></g></svg>
+<figcaption>Parcel workflow</figcaption></figure>
+<details><summary>Editable Mermaid diagram source</summary><pre><code>flowchart TD
+  B[Booked] --&gt;|Optional assigned rider pickup| P[Picked up]
+  B --&gt;|Sender drops off| O[At origin station]
+  P --&gt;|Origin operator confirms receipt| O
+  O --&gt;|Verified receipt and carrier collection| T[In transit]
+  T --&gt;|Destination operator confirms receipt| D[At destination station]
+  D --&gt;|Recipient code and station collection| F[Delivered]
+  D --&gt;|Verified receipt and assigned rider collection| L[Out for delivery]
+  L --&gt;|Recipient code plus photo and signature| F
+  B --&gt;|Eligible cancellation| C[Cancelled]
+  O --&gt;|Eligible cancellation| C
+  E[Exception] --&gt;|Sender code and station confirmation| R[Returned]
+</code></pre></details>
+<p>Permitted non-closed parcels may be flagged as exception separately. The diagram omits those repeated arrows for readability. Payment submission and verification happen alongside custody and do not independently change parcel status.</p>
+<h2 id="state-and-custody-rules">State and custody rules</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Current state</th>
+<th>Requested state</th>
+<th>Confirming receiving account</th>
+<th>Code is issued to</th>
+<th>Additional guards</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>booked</td>
+<td>picked_up</td>
+<td>Assigned rider</td>
+<td>Sender/current holder</td>
+<td>Pickup address and accepted first-mile task</td>
+</tr>
+<tr>
+<td>booked</td>
+<td>at_origin_station</td>
+<td>Origin station operator</td>
+<td>Sender/current holder</td>
+<td>Independent releasing and receiving accounts</td>
+</tr>
+<tr>
+<td>picked_up</td>
+<td>at_origin_station</td>
+<td>Origin station operator</td>
+<td>Current rider</td>
+<td>Completes accepted first-mile task</td>
+</tr>
+<tr>
+<td>at_origin_station</td>
+<td>in_transit</td>
+<td>Assigned carrier</td>
+<td>Origin station operator/current holder</td>
+<td>Verified payment and accepted transport task</td>
+</tr>
+<tr>
+<td>in_transit</td>
+<td>at_destination_station</td>
+<td>Destination station operator</td>
+<td>Carrier/current holder</td>
+<td>Completes accepted transport task</td>
+</tr>
+<tr>
+<td>at_destination_station</td>
+<td>out_for_delivery</td>
+<td>Assigned rider</td>
+<td>Destination station operator/current holder</td>
+<td>Home preference, verified payment and accepted last-mile task</td>
+</tr>
+<tr>
+<td>at_destination_station</td>
+<td>delivered</td>
+<td>Destination station operator</td>
+<td>Recipient</td>
+<td>Station preference</td>
+</tr>
+<tr>
+<td>out_for_delivery</td>
+<td>delivered</td>
+<td>Assigned rider</td>
+<td>Recipient</td>
+<td>Delivery photo and signature; completes last-mile task</td>
+</tr>
+<tr>
+<td>exception</td>
+<td>returned</td>
+<td>Origin or destination station operator</td>
+<td>Sender</td>
+<td>Fresh return code</td>
+</tr>
+<tr>
+<td>booked or at_origin_station</td>
+<td>cancelled</td>
+<td>Sender, operations or administrator</td>
+<td>No code required</td>
+<td>No verified payment; cancellation reason</td>
+</tr>
+<tr>
+<td>Non-closed state</td>
+<td>exception</td>
+<td>Current holder or authorized station/operations staff</td>
+<td>No code required</td>
+<td>Issue note; no completed journey</td>
+</tr>
+</tbody>
+</table></div>
+<p>Codes are six digits, expire after fifteen minutes and belong to a specific next state. Five recorded attempts lock that issued code. Codes are hashed in Parcel.handover_otp and an active code cannot be regenerated to reset its attempt counter. A successful transfer clears it. A rejected attempt is appended as an alert event and does not advance the parcel. For ordinary network transfers the receiver must differ from the current custodian.</p>
+<p>Booked parcels with a pickup address must complete picked_up before origin receipt; walk-in parcels go directly to origin receipt. Code issuance and custody validation enforce this distinction. At destination, both follow the selected station/home receiving preference.</p>
+<h2 id="wf01-account-access">WF01 Account access</h2>
+<ol>
+<li>Credential users submit POST /api/auth/token/ and fetch GET /api/users/me/.</li>
+<li>Phone users submit POST /api/auth/phone/request/ with name, +263 phone and public account role.</li>
+<li>The server stores a hashed ten-minute challenge and queues an SMS delivery.</li>
+<li>POST /api/auth/phone/verify/ checks expiry, attempt limit and prior use, then creates or resolves the account and returns tokens.</li>
+<li>The workspace verifies the current profile and restricts navigation to the account role.</li>
+</ol>
+<p>Existing staff must use credentials. Wrong or expired codes require another request. Local development may display a code with an explicit no-SMS warning. JWT refresh is available at POST /api/auth/token/refresh/; the active frontend does not yet automate refresh.</p>
+<h2 id="wf02-partner-approval">WF02 Partner approval</h2>
+<ol>
+<li>A rider or carrier signs in with the corresponding role.</li>
+<li>The partner supplies its station or vehicle details and an attachment through the application page.</li>
+<li>POST /api/riders/ or /api/carriers/ creates the pending profile.</li>
+<li>Operations reviews the privately served document.</li>
+<li>POST /api/onboarding/{id}/approve/ or reject/ supplies the profile type and review reason.</li>
+<li>Rejected applicants resubmit using PATCH on their own profile; status resets to pending.</li>
+<li>Approved riders set availability with POST /api/riders/availability/.</li>
+</ol>
+<p>Approval is a manual prerequisite for assignment. It does not create an assignment or a carrier departure.</p>
+<h2 id="wf03-booking-and-quoting">WF03 Booking and quoting</h2>
+<ol>
+<li>Choose active stations on the pilot pair, including the desired direction.</li>
+<li>GET /api/rates/lookup/ resolves origin city, destination city and weight band.</li>
+<li>The lookup prefers a tariff overridden for the origin station, otherwise the default city-pair rule.</li>
+<li>Supply recipient details, parcel photo and any pickup address or handling instructions.</li>
+<li>For a walk-in booking, authorized staff also supplies sender name and phone.</li>
+<li>POST /api/parcels/ creates the priced shipment, sender relationship, booked_by relationship, initial custody projection and booking event.</li>
+<li>The customer receives the shipment code and the recipient notification includes a secret tracking link.</li>
+</ol>
+<p>Both UI and API require a valid parcel photo and supported weight band; Zimbabwe phone validation applies to recipient and station-booked sender details. Station staff can book only from their own origin station. Rates are illustrative seed values in USD and are not live market quotations.</p>
+<h2 id="wf04-trip-scheduling-and-manual-matching">WF04 Trip scheduling and manual matching</h2>
+<ol>
+<li>An approved carrier or authorized staff creates a future route departure through POST /api/trips/.</li>
+<li>Capacity must be positive and no greater than the vehicle capacity.</li>
+<li>Operations selects a trip for a shipment through POST /api/matching/{parcel_id}/assign/.</li>
+<li>The service checks exact route direction, active approval and remaining capacity.</li>
+<li>Local riders must be approved, active, available and based in the appropriate origin or destination town.</li>
+<li>The service creates offered tasks for selected workers and declines conflicting active offers for that leg.</li>
+<li>Workers use POST /api/tasks/{id}/accept/ or decline/.</li>
+</ol>
+<p>Capacity reservation uses the upper bound of each booked weight band. Delivered, returned and cancelled parcels are excluded from the current capacity calculation. An exception parcel still consumes capacity. Matching is manual; there is no automatic dispatch engine.</p>
+<p>Task states are offered, accepted, declined and completed. Collection changes custody but leaves the task accepted until the receiving station or recipient confirms the leg's completion.</p>
+<h2 id="wf05-receipt-submission-and-review">WF05 Receipt submission and review</h2>
+<details><summary>Editable Mermaid diagram source</summary><pre><code>flowchart LR
+  X[External payment] --&gt; U[Upload receipt]
+  U --&gt; P[Pending review]
+  P --&gt;|Finance or operations| V[Verified]
+  P --&gt;|Evidence rejected| R[Rejected]
+  R --&gt; U
+  V --&gt; D[Dispatch permitted]
+</code></pre></details>
+<ol>
+<li>The sender, authorized staff or a worker with an accepted assignment makes or records payment outside the application.</li>
+<li>POST /api/parcels/{code}/mark-paid/ submits method, transaction reference and receipt_photo as multipart data.</li>
+<li>The server stores the parcel price as the payment amount and resets an unverified record to pending.</li>
+<li>Finance, operations or administrator reviews evidence through POST /api/payments/{id}/verify/.</li>
+<li>A verified record needs a receipt and matching parcel price, and cannot be replaced.</li>
+<li>Carrier departure and home-delivery departure check for verified status.</li>
+</ol>
+<p>A rejected receipt can be resubmitted. Verification does not itself dispatch a parcel, send money or change custody. No gateway, refund ledger or accounting reconciliation integration exists.</p>
+<h2 id="wf06-network-custody">WF06 Network custody</h2>
+<h3 id="first-mile-and-origin-receipt">First mile and origin receipt</h3>
+<p>For pickup, the rider accepts its first-mile assignment. POST /api/parcels/{code}/handover-code/ requests picked_up. The sender receives the code and shares it when the parcel changes hands. The rider sends to_status and otp through POST /api/tasks/{id}/complete/. For walk-in drop-off, the origin operator instead confirms at_origin_station through POST /api/parcels/{code}/handover/.</p>
+<p>When a rider arrives at origin, the operator receives the rider's code and confirms at_origin_station. The server changes current_holder to the operator and completes the first-mile task.</p>
+<h3 id="carrier-departure-and-destination-receipt">Carrier departure and destination receipt</h3>
+<p>The carrier accepts its inter-town task. It obtains the origin operator's code for in_transit and confirms collection through the task completion endpoint. The server verifies payment, receiving identity and task acceptance. The transport task remains accepted during transit.</p>
+<p>On arrival, the destination operator obtains the carrier's code and confirms at_destination_station through the station handover endpoint. The service completes the carrier task and changes custody to the destination operator.</p>
+<h2 id="wf07-recipient-choice-and-delivery">WF07 Recipient choice and delivery</h2>
+<p>The sender can use POST /api/parcels/{code}/delivery-choice/. A guest recipient uses GET/POST /api/track/{token}/preferences/. The token is a credential for one shipment; keep it private. Home selection requires address details and becomes locked at home-delivery departure or a closed status.</p>
+<h3 id="station-collection">Station collection</h3>
+<ol>
+<li>Recipient opens the secret link at the station.</li>
+<li>POST /api/track/{token}/code/ issues a delivery-specific receiving code.</li>
+<li>Destination operator enters it for delivered.</li>
+<li>The service checks station collection preference and operator identity.</li>
+<li>Recipient confirmation is recorded, and network custody ends.</li>
+</ol>
+<h3 id="home-delivery">Home delivery</h3>
+<ol>
+<li>Operations assigns an available destination-town rider.</li>
+<li>Rider accepts its last-mile task.</li>
+<li>Destination operator releases the parcel using a code for out_for_delivery.</li>
+<li>Rider confirms collection; verified payment is checked again.</li>
+<li>Recipient generates the final receiving code.</li>
+<li>Rider records the code, a photo and a confirmed signature in the task handover form.</li>
+<li>The service sets delivered, completes the task and retains private proof paths.</li>
+</ol>
+<p>The application does not require a recipient account for either option. Ordinary parcel serializers omit handover codes; a code is returned only to the independent confirming party or through the authorized recipient link.</p>
+<h2 id="wf08-cancellation-and-exceptions">WF08 Cancellation and exceptions</h2>
+<p>Eligible cancellation requires booked or origin-station status and no verified payment. POST /api/parcels/{code}/cancel/ appends a reasoned event, sets cancelled and declines offered/accepted tasks. Paid cancellation needs a support-assisted external process.</p>
+<p>POST /api/parcels/{code}/exception/ records a problem and sets exception. The only implemented subsequent custody transition is returned. A station operator requests a fresh return code issued to the sender, then confirms return through the handover or exception-resolution endpoint. The current model does not distinguish attempted return, sender pickup and refund as separate states.</p>
+<h2 id="wf09-settlement-and-earnings">WF09 Settlement and earnings</h2>
+<details><summary>Editable Mermaid diagram source</summary><pre><code>flowchart LR
+  D[Delivered and verified] --&gt; A[Allocate partner legs and platform remainder]
+  A --&gt; P[Pending]
+  P --&gt;|Authorized approval| V[Approved]
+  V --&gt; E[External disbursement]
+  E --&gt;|Record reference| F[Paid]
+</code></pre></details>
+<ol>
+<li>POST /api/payouts/run/ receives parcel database ID, period, first_mile_rider, last_mile_rider, carrier and station amounts. Unused rider legs receive zero.</li>
+<li>The service rejects repeated runs, missing nonzero beneficiaries or allocations greater than price.</li>
+<li>Platform amount is price minus the partner allocations.</li>
+<li>Rider beneficiaries come from completed first-mile and last-mile tasks, not the overwritten current rider. Carrier beneficiary comes from the assigned carrier; station beneficiary is the origin operator.</li>
+<li>POST /api/payouts/{id}/settle/ with action approve records approver and approval time.</li>
+<li>After external payment, action disburse and a reference records paid status and time.</li>
+<li>Partners read their own allocations through GET /api/earnings/ and retrieve individual HTML statements.</li>
+<li>Authorized staff can download payment and payout CSV exports.</li>
+</ol>
+<p>Allocations are not automatic transfers. Explicit-leg runs create five lines (two rider legs, carrier, origin station, platform), including zero-valued unused legs. Legacy rider requests create four lines and reject ambiguous two-rider allocations. FinanceEvent records allocation runs, approval, disbursement and receipt review.</p>
+<h2 id="wf10-support-notifications-and-addresses">WF10 Support notifications and addresses</h2>
+<p>Support tickets store conversation messages in JSON with author and timestamp. Ticket creation records whether local time falls outside 08:00–20:00 and queues a helpdesk request. Support staff can set open, waiting_customer, resolved or closed; a closed conversation rejects replies. Helpdesk creation, replies and status changes are delivered through the adapter. Contacts outside 08:00–20:00 are scheduled for the next 08:00 opening; the worker skips them without consuming retries. /api/support-contact/ exposes the configured support phone and public portal URL, not provider secrets.</p>
+<p>Booking, origin receipt, transit, destination receipt, delivery and exception generate notifications and SMS outbox entries. Notification.read_at tracks user acknowledgement. IntegrationDelivery tracks adapter processing and synchronizes linked Notification.status/sent_at. Development delivery stays development with no sent timestamp. Provider acceptance is not proof of delivery to the handset.</p>
+<p>Saved addresses belong to the customer. Setting a default locks the user, clears prior defaults and applies the new default under a conditional uniqueness constraint.</p>
+<h2 id="wf11-offline-capture-and-retry">WF11 Offline capture and retry</h2>
+<details><summary>Editable Mermaid diagram source</summary><pre><code>flowchart LR
+  C[Capture handover] --&gt; Q[Account-scoped device queue]
+  Q --&gt; N[Connectivity returns]
+  N --&gt; S[Submit with stable retry key]
+  S --&gt;|Accepted or identical replay| D[Remove queued item]
+  S --&gt;|Validation error| F[Show failed item]
+  F --&gt; R[Fresh code and new capture]
+</code></pre></details>
+<p>The active task completion form can queue multipart data and files when navigator.onLine is false or a submission receives no server response due to a network failure. IndexedDB also stores fetched responses under account-scoped cache keys. Only work for the signed-in account is synchronized. Failed submissions stop the worker for investigation; retry or discard is available in the queue.</p>
+<p>Task completion uses MutationReceipt with a unique user/key pair and a request fingerprint. Matching key and payload replays the original response; changed payload rejects reuse. A successful network submission is the confirmation point. The original network request and queued retry use the same idempotency key, so an accepted request with a lost response is not applied twice. Cached reads also recover on network failures; HTTP authorization/validation failures are not masked by cached data.</p>
+<h2 id="wf12-reporting-administration-and-archive-recovery">WF12 Reporting administration and archive recovery</h2>
+<p>Reports expose:</p>
+<ul>
+<li>Volumes and delivered shipments from parcel records.</li>
+<li>Verified revenue from verified Payment amounts.</li>
+<li>Disbursements from paid Payout lines.</li>
+<li>First-attempt home delivery success from shipments dispatched for home delivery without an exception.</li>
+<li>Custody completeness from delivered journeys with the required accepted OTP transitions.</li>
+<li>Pre-dispatch verification from payment timestamps compared with the first dispatch event.</li>
+<li>The qualifying denominator for each quality measure.</li>
+</ul>
+<p>After a StatusEvent insert, a signal creates an event_log outbox record. Run the worker from backend:</p>
+<pre><code class="language-powershell">python manage.py process_outbox --kind event_log
+python manage.py rebuild_tracking
+</code></pre>
+<p>The first command replicates queued or failed archive entries. The second checks parcel status/holder projections without mutation. Only during a controlled maintenance window, after draining replication and backing up data, use rebuild_tracking --apply to repair projections. It does not rebuild payment, task or file records. Pending archive delivery prevents replay.</p>
+<p>The worker also accepts --kind sms or --kind helpdesk. Entries with fewer than ten attempts are eligible for retries. Local console SMS is marked development and sends nothing externally; HTTPS webhook acceptance is marked sent, which is not an end-recipient delivery acknowledgement. Scheduling the command, selecting providers and configuring secrets remain deployment responsibilities.</p>
+<h2 id="operating-limits-and-implementation-references">Operating limits and implementation references</h2>
+<p>The current implementation has no payment gateway, automatic matching, native mobile application, barcode scanning, automatic refund workflow or provider delivery callbacks. Seeded historical journeys may lack actual proof files and should not be used as evidence of completed real-world transfers.</p>
+<p>Custody and settlement logic resides in workflows.py; booking, receipt and matching services reside in services.py. Views and serializers expose the validated API. The database reference documents the exact tables and relationships. See <a href="use-cases.html">Use cases</a> and <a href="database.html">Database reference</a>.</p><footer>Source-verified implementation. See the document header and update notes for version details. Print from the browser for a PDF copy.</footer></main></body></html>

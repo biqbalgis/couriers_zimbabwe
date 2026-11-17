@@ -1,0 +1,91 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pano Logistics Pilot Launch Runbook</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#24392f;font:16px/1.65 Arial,Helvetica,sans-serif}.toolbar{background:#102f28;color:white;padding:16px 24px;display:flex;flex-wrap:wrap;gap:18px}.toolbar a{color:white;font-size:14px}.document{max-width:1120px;margin:32px auto;padding:48px 56px;background:white;border:1px solid #e0e8e3;border-radius:12px}h1,h2,h3{color:#000;line-height:1.25;scroll-margin-top:24px}h1{font-size:36px}h2{font-size:25px;margin-top:40px;border-bottom:1px solid #e0e8e3;padding-bottom:10px}h3{font-size:19px;margin-top:28px}a{color:#146c56}code{font:13px Consolas,monospace;overflow-wrap:anywhere}pre{background:#f5f7f5;padding:18px;border:1px solid #e0e8e3;border-radius:6px;overflow:auto}.table-wrap{overflow-x:auto;margin:20px 0}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.5}th,td{border:1px solid #d9d9d9;padding:10px 12px;text-align:left;vertical-align:middle;overflow-wrap:anywhere}th{background:#eaf0ec;color:black}tr:nth-child(even) td{background:#fafcfb}figure{margin:24px 0}figure svg{width:100%;height:auto;display:block}figcaption,footer{font-size:13px;color:#62766d}li{margin:6px 0}details{margin:16px 0}summary{cursor:pointer}footer{border-top:1px solid #e0e8e3;margin-top:40px;padding-top:16px}@media(max-width:700px){.document{margin:12px;padding:24px 18px}h1{font-size:28px}table{font-size:12px}}@media print{@page{size:A4;margin:18mm}.toolbar{display:none}body{background:white;font-size:10.5pt}.document{border:0;margin:0;padding:0;max-width:none}h1{font-size:25pt}h2{font-size:17pt;break-after:avoid}h3{font-size:13pt;break-after:avoid}table{font-size:8.5pt}thead{display:table-header-group}tr,figure{break-inside:avoid}.table-wrap{overflow:visible}pre{white-space:pre-wrap;overflow-wrap:anywhere}details{display:none}}</style></head><body><nav class="toolbar" aria-label="Document navigation"><a href="use-cases.html">Use cases</a><a href="workflows.html">Workflows</a><a href="database.html">Database and ER</a><a href="proposal-audit.html">Proposal audit</a><a href="launch-runbook.html">Launch runbook</a><a href="training.html">Training</a></nav><main class="document"><h1 id="pano-logistics-pilot-launch-runbook">Pano Logistics Pilot Launch Runbook</h1>
+<p>Version 1.1 · 1 October 2026 · Mutare–Chipinge</p>
+<h2 id="launch-rule">Launch rule</h2>
+<p>The repository is not proof of a launched service. The operator must name owners, confirm commercial dependencies and sign off a rehearsal. Keep customer traffic disabled until all launch gates pass. Never run seed_demo against a production database or reuse demo passwords.</p>
+<h2 id="owners-and-required-evidence">Owners and required evidence</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Owner</th>
+<th>Gate</th>
+<th>Evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Operator/product owner</td>
+<td>Signed stations, approved tariffs/payment numbers, participation/liability and regulatory arrangements</td>
+<td>Approved pilot checklist</td>
+</tr>
+<tr>
+<td>Technical owner</td>
+<td>PostgreSQL, private media, restricted hosts/CORS, HTTPS, secret management and backups</td>
+<td>Deployment/configuration review and successful restore rehearsal</td>
+</tr>
+<tr>
+<td>Integration owner</td>
+<td>SMS and SaaS helpdesk/telephony procurement, provider bridge, support line</td>
+<td>SMS received on a real handset; external ticket/reply/status roundtrip; test call and after-hours queue</td>
+</tr>
+<tr>
+<td>Operations lead</td>
+<td>Vetted workers, assigned trips/capacity and custody rehearsal</td>
+<td>Two independent operators, carrier and riders complete an end-to-end parcel</td>
+</tr>
+<tr>
+<td>Finance lead</td>
+<td>Payment verification and agreed payout cycle</td>
+<td>Receipt reconciliation, approved leg split, external transfers and participant statements</td>
+</tr>
+<tr>
+<td>Support lead</td>
+<td>08:00–20:00 Harare coverage, escalation and overnight queue</td>
+<td>Roster, emergency/escalation numbers and next-opening handling rehearsal</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="configure-and-deploy">Configure and deploy</h2>
+<ol>
+<li>Provision PostgreSQL and private, backed-up media storage. Current local verification uses SQLite; test migrations and concurrency on PostgreSQL before launch.</li>
+<li>Set DJANGO_DEBUG=0, a strong DJANGO_SECRET_KEY, restricted DJANGO_ALLOWED_HOSTS and HTTPS CORS_ALLOWED_ORIGINS/PUBLIC_WEB_URL. Do not expose uploads as public static files.</li>
+<li>Set SMS_DELIVERY_MODE=webhook, SMS_WEBHOOK_URL and SMS_WEBHOOK_TOKEN. The HTTPS bridge accepts to, message and optional notification_id. Never include server tokens in VITE variables.</li>
+<li>Set HELPDESK_WEBHOOK_URL/TOKEN, SUPPORT_PHONE and optional public HELPDESK_PORTAL_URL. Helpdesk payloads contain action=create/reply/status, ticket_id, external_reference, subject, phone, parcel, messages and status. Configure telephony and staff access in the chosen SaaS product.</li>
+<li>Back up the database, media and custody archive before migration. Apply the migration using Django; existing handover codes expire under 0005 and must be requested again. Do not roll back the schema blindly after new leg payouts exist.</li>
+<li>Build the frontend and serve its public PWA assets over HTTPS with the API same-origin or correctly proxied. Install the field PWA on pilot devices.</li>
+</ol>
+<pre><code class="language-powershell">cd backend
+python manage.py migrate
+python manage.py check
+python manage.py check --deploy
+python manage.py test marketplace
+python manage.py check_pilot
+cd ../frontend
+npm.cmd run build
+</code></pre>
+<p>check_pilot is read-only and does not contact providers. Missing prerequisites fail the command. --development skips production infrastructure gates but still reports missing integrations. A passing check is not a substitute for real provider and operational tests.</p>
+<h2 id="workers-and-archive">Workers and archive</h2>
+<p>Schedule the following with a monitored service or scheduler at least once a minute. Keep service credentials private; alert on command failures, failed outbox records and records with ten attempts. Do not repeatedly retry invalid credentials without investigation. available_at prevents processing after-hours helpdesk contacts before the next 08:00 opening.</p>
+<pre><code class="language-powershell">python manage.py process_outbox --kind sms --limit 100
+python manage.py process_outbox --kind helpdesk --limit 100
+python manage.py process_outbox --kind event_log --limit 100
+</code></pre>
+<p>The worker marks a successful HTTPS response sent, not delivered-to-handset. Local console messages remain development. Idempotency-Key pano-{outbox_id} must be honored by provider bridges to prevent duplicate external tickets/messages after uncertain responses. Creation must establish the external ticket before reply/status handling; bridges should resolve the stable ticket_id even if an external reference is still blank.</p>
+<h2 id="rehearsal-and-acceptance">Rehearsal and acceptance</h2>
+<p>Use a real approved test account and consented test phone, not an unsuspecting customer's number.</p>
+<ol>
+<li>Verify phone sign-up and staff credential access; check another customer's shipment cannot be read.</li>
+<li>Book both pilot directions, including a walk-in parcel and a photo-based pickup request.</li>
+<li>Submit a receipt, verify the correct amount and prove route/home dispatch rejects unverified payments.</li>
+<li>Accept every task and complete each handover with independent confirming-party codes. Prove a wrong/out-of-order code logs an alert without custody movement.</li>
+<li>Rehearse station collection and home delivery with photo/signature. Test two different pickup/delivery riders and their separate payout beneficiaries.</li>
+<li>Disconnect a field device, capture a handover and reconnect. Inspect queued/failed work, expiry behavior and duplicate retry prevention. Clear caches from shared devices before handover to another user.</li>
+<li>Verify tracking SMS, helpdesk contact/replies/status and after-hours next-opening delivery, including a call to the support line.</li>
+<li>Approve allocations, make external transfers, record references and retrieve statements/CSV. Confirm totals balance and a duplicate run is rejected.</li>
+<li>Drain archive replication and run rebuild_tracking without --apply; investigate mismatches. Demonstrate a backup restore on an isolated environment.</li>
+<li>Record metrics and customer/carrier feedback. Authorize traffic only after the operator signs off.</li>
+</ol>
+<h2 id="incident-rollback-and-recovery">Incident, rollback and recovery</h2>
+<p>Stop new booking/dispatch traffic at the ingress during an incident; preserve pending queues, events and accounting records. Do not delete failed attempts or change payout amounts to make totals look correct. Revert application releases only if they remain compatible with migration 0005. Use a maintained backup/restore plan for database, media and archive together.</p>
+<p>To repair a projection, stop writes, back up all stores and first drain event_log delivery. Run rebuild_tracking in check mode. Only an authorized technical owner may run rebuild_tracking --apply during maintenance after verifying the archive. Replay repairs status/holder only, not payments, tasks, files or provider messages.</p>
+<h2 id="pilot-review-record">Pilot review record</h2>
+<p>Track daily volumes, delivered parcels, first-attempt home delivery (&gt;80% target), complete OTP custody (100% target), verified-before-dispatch rate, payout accuracy, failed outbox/queue items and qualitative feedback. Reports provide counts/denominators, not proof of operator compliance. Keep a weekly learning log with issue, owner, action and follow-up date.</p><footer>Source-verified implementation · Version 1.1 · 1 October 2026. Print from the browser for a PDF copy.</footer></main></body></html>

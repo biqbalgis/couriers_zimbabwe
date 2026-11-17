@@ -1,0 +1,9 @@
+export type ParcelStatus='booked'|'at_origin_station'|'in_transit'|'at_destination_station'|'delivered'|'exception'|'returned';
+export interface City{id:number;name:string;province:string}
+export interface Station{id:number;name:string;city:number;city_name:string;address:string;payment_number:string}
+export interface StatusEvent{id:number;from_status:string;to_status:ParcelStatus;note:string;accepted:boolean;timestamp:string;actor_name?:string}
+export interface Parcel{id:number;code:string;recipient_name:string;recipient_phone:string;status:ParcelStatus;price:string;handover_otp:string;origin_station_detail:Station;destination_station_detail:Station;events:StatusEvent[]}
+export interface Task{id:number;type:'first_mile_pickup'|'inter_town_transport'|'last_mile_delivery';status:string;parcel_detail:Parcel}
+export type UserRole='customer'|'rider'|'carrier'|'station_operator'|'ops'|'finance'|'support'|'admin';
+export interface User{id:number;username:string;phone:string;name:string;role:UserRole;verified:boolean}
+export interface Rate{id:number;origin_city:number;destination_city:number;weight_band:string;price:string;station_override:number|null}

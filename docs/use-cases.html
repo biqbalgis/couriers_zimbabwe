@@ -1,0 +1,314 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pano Logistics Use Case Document</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#24392f;font:16px/1.65 Arial,Helvetica,sans-serif}.toolbar{background:#102f28;color:white;padding:16px 24px;display:flex;flex-wrap:wrap;gap:18px}.toolbar a{color:white;font-size:14px}.document{max-width:1120px;margin:32px auto;padding:48px 56px;background:white;border:1px solid #e0e8e3;border-radius:12px}h1,h2,h3{color:#000;line-height:1.25;scroll-margin-top:24px}h1{font-size:36px}h2{font-size:25px;margin-top:40px;border-bottom:1px solid #e0e8e3;padding-bottom:10px}h3{font-size:19px;margin-top:28px}a{color:#146c56}code{font:13px Consolas,monospace;overflow-wrap:anywhere}pre{background:#f5f7f5;padding:18px;border:1px solid #e0e8e3;border-radius:6px;overflow:auto}.table-wrap{overflow-x:auto;margin:20px 0}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.5}th,td{border:1px solid #d9d9d9;padding:10px 12px;text-align:left;vertical-align:middle;overflow-wrap:anywhere}th{background:#eaf0ec;color:black}tr:nth-child(even) td{background:#fafcfb}figure{margin:24px 0}figure svg{width:100%;height:auto;display:block}figcaption,footer{font-size:13px;color:#62766d}li{margin:6px 0}details{margin:16px 0}summary{cursor:pointer}footer{border-top:1px solid #e0e8e3;margin-top:40px;padding-top:16px}@media(max-width:700px){.document{margin:12px;padding:24px 18px}h1{font-size:28px}table{font-size:12px}}@media print{@page{size:A4;margin:18mm}.toolbar{display:none}body{background:white;font-size:10.5pt}.document{border:0;margin:0;padding:0;max-width:none}h1{font-size:25pt}h2{font-size:17pt;break-after:avoid}h3{font-size:13pt;break-after:avoid}table{font-size:8.5pt}thead{display:table-header-group}tr,figure{break-inside:avoid}.table-wrap{overflow:visible}pre{white-space:pre-wrap;overflow-wrap:anywhere}details{display:none}}</style></head><body><nav class="toolbar" aria-label="Document navigation"><a href="use-cases.html">Use cases</a><a href="workflows.html">Workflows</a><a href="database.html">Database and ER</a><a href="proposal-audit.html">Proposal audit</a><a href="launch-runbook.html">Launch runbook</a><a href="training.html">Training</a></nav><main class="document"><h1 id="pano-logistics-use-case-document">Pano Logistics Use Case Document</h1>
+<p>Version 1.2 · 2 October 2026 · Mutare–Chipinge pilot</p>
+<h2 id="purpose-and-scope">Purpose and scope</h2>
+<p>This document describes how senders, recipients, delivery partners and staff use the implemented Pano Logistics application. It is intended for product owners, pilot operators, developers and acceptance testers. The application uses React and MUI with a Django REST Framework backend. PostgreSQL is supported through configuration; the reviewed local database uses SQLite.</p>
+<p>The pilot route is Mutare–Chipinge in either direction. The network uses partner stations, local riders and inter-town carriers. Payments and disbursements happen outside the application; the system records receipts, verification and settlement references. No SMS or helpdesk provider has been selected. Configurable server adapters and a durable outbox exist, but this does not establish live provider delivery.</p>
+<h2 id="actors-and-responsibilities">Actors and responsibilities</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Actor</th>
+<th>Responsibilities</th>
+<th>Record scope</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Customer</td>
+<td>Book parcels, upload receipts, choose delivery preferences, save addresses and request support</td>
+<td>Parcels sent by the account and its own addresses</td>
+</tr>
+<tr>
+<td>Guest recipient</td>
+<td>Track a shipment, choose station or home delivery and obtain a receiving code</td>
+<td>The shipment identified by a secret recipient link</td>
+</tr>
+<tr>
+<td>Rider</td>
+<td>Apply for approval, set availability, accept local assignments, collect and deliver parcels</td>
+<td>Assigned tasks and related shipments</td>
+</tr>
+<tr>
+<td>Carrier</td>
+<td>Apply with vehicle details, schedule trips and accept inter-town assignments</td>
+<td>Own trips, assigned tasks and related shipments</td>
+</tr>
+<tr>
+<td>Station operator</td>
+<td>Book walk-in shipments, receive custody, hand over station collections and inspect station shipments</td>
+<td>Shipments whose origin or destination is an operated station</td>
+</tr>
+<tr>
+<td>Operations</td>
+<td>Review partners, assign transport, review receipts, handle exceptions and inspect reports</td>
+<td>Operational shipment records across the network</td>
+</tr>
+<tr>
+<td>Finance</td>
+<td>Review receipts, allocate and approve settlement, record disbursement references and export records</td>
+<td>Network financial records and reporting</td>
+</tr>
+<tr>
+<td>Support</td>
+<td>View network parcels, manage support conversations and change ticket status</td>
+<td>Network support records</td>
+</tr>
+<tr>
+<td>Administrator</td>
+<td>Manage accounts, reference data, pilot configuration and operational workflows</td>
+<td>Administrative and operational records</td>
+</tr>
+</tbody>
+</table></div>
+<p>The server is the authorization authority. Hiding a navigation item does not grant or remove an API permission. Ordinary staff privileges are controlled by the role field; Django superuser access is an additional administrative override. A station operator can book only from a station operated by that account.</p>
+<h2 id="use-case-catalog">Use case catalog</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Use case</th>
+<th>Primary actor</th>
+<th>Related workflow</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC01</td>
+<td>Sign in with credentials</td>
+<td>All account holders</td>
+<td>WF01</td>
+</tr>
+<tr>
+<td>UC02</td>
+<td>Verify a phone and create or access an account</td>
+<td>Customer, rider, carrier</td>
+<td>WF01</td>
+</tr>
+<tr>
+<td>UC03</td>
+<td>Submit or resubmit a partner application</td>
+<td>Rider, carrier</td>
+<td>WF02</td>
+</tr>
+<tr>
+<td>UC04</td>
+<td>Review a partner application</td>
+<td>Operations, administrator</td>
+<td>WF02</td>
+</tr>
+<tr>
+<td>UC05</td>
+<td>Book a parcel</td>
+<td>Customer</td>
+<td>WF03</td>
+</tr>
+<tr>
+<td>UC06</td>
+<td>Book for a walk-in sender</td>
+<td>Station operator, operations, administrator</td>
+<td>WF03</td>
+</tr>
+<tr>
+<td>UC07</td>
+<td>Obtain a route and weight quote</td>
+<td>Sender or booking staff</td>
+<td>WF03</td>
+</tr>
+<tr>
+<td>UC08</td>
+<td>Schedule a carrier trip</td>
+<td>Carrier, operations, administrator</td>
+<td>WF04</td>
+</tr>
+<tr>
+<td>UC09</td>
+<td>Assign a rider or trip</td>
+<td>Station operator, operations, administrator</td>
+<td>WF04</td>
+</tr>
+<tr>
+<td>UC10</td>
+<td>Accept or decline an assignment</td>
+<td>Assigned rider or carrier</td>
+<td>WF04</td>
+</tr>
+<tr>
+<td>UC11</td>
+<td>Submit and review payment evidence</td>
+<td>Sender, assigned worker, staff</td>
+<td>WF05</td>
+</tr>
+<tr>
+<td>UC12</td>
+<td>Collect a first-mile parcel</td>
+<td>Assigned rider</td>
+<td>WF06</td>
+</tr>
+<tr>
+<td>UC13</td>
+<td>Receive a parcel at origin</td>
+<td>Origin station operator</td>
+<td>WF06</td>
+</tr>
+<tr>
+<td>UC14</td>
+<td>Transport a parcel between towns</td>
+<td>Carrier and destination operator</td>
+<td>WF06</td>
+</tr>
+<tr>
+<td>UC15</td>
+<td>Choose a receiving method</td>
+<td>Sender or guest recipient</td>
+<td>WF07</td>
+</tr>
+<tr>
+<td>UC16</td>
+<td>Complete station collection</td>
+<td>Recipient and destination operator</td>
+<td>WF07</td>
+</tr>
+<tr>
+<td>UC17</td>
+<td>Complete home delivery</td>
+<td>Recipient and assigned rider</td>
+<td>WF07</td>
+</tr>
+<tr>
+<td>UC18</td>
+<td>Cancel before dispatch</td>
+<td>Sender, operations, administrator</td>
+<td>WF08</td>
+</tr>
+<tr>
+<td>UC19</td>
+<td>Record an exception and return a parcel</td>
+<td>Custodian, station staff, operations</td>
+<td>WF08</td>
+</tr>
+<tr>
+<td>UC20</td>
+<td>Allocate and settle a payout</td>
+<td>Finance, operations, administrator</td>
+<td>WF09</td>
+</tr>
+<tr>
+<td>UC21</td>
+<td>Review earnings and statements</td>
+<td>Rider, carrier, station operator</td>
+<td>WF09</td>
+</tr>
+<tr>
+<td>UC22</td>
+<td>Open and manage a support conversation</td>
+<td>Account holder and support staff</td>
+<td>WF10</td>
+</tr>
+<tr>
+<td>UC23</td>
+<td>Read notifications and save addresses</td>
+<td>Account holder or customer</td>
+<td>WF10</td>
+</tr>
+<tr>
+<td>UC24</td>
+<td>Synchronize an offline handover</td>
+<td>Assigned field worker</td>
+<td>WF11</td>
+</tr>
+<tr>
+<td>UC25</td>
+<td>Review performance and custody records</td>
+<td>Authorized staff</td>
+<td>WF12</td>
+</tr>
+<tr>
+<td>UC26</td>
+<td>Manage users and network configuration</td>
+<td>Administrator and authorized reference-data staff</td>
+<td>WF12</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="account-and-partner-use-cases">Account and partner use cases</h2>
+<h3 id="uc01-sign-in-with-credentials">UC01 Sign in with credentials</h3>
+<p>Precondition: an active account exists. The user enters a username and password. The API issues access and refresh tokens, and the frontend obtains the authoritative account profile before opening the role workspace. Incorrect credentials produce an error. A session retrieval failure offers retry; an authentication failure redirects to login. Outcome: the account can use its permitted workspace. Access tokens currently last eight hours; automatic frontend refresh is not implemented.</p>
+<h3 id="uc02-verify-a-phone">UC02 Verify a phone</h3>
+<p>The user supplies a full name, a Zimbabwe phone number in +263 followed by nine digits, and customer, rider or carrier as the intended role. The system creates a hashed challenge valid for ten minutes and queues the code. Verification allows at most five attempts, consumes the challenge on success, and returns account tokens. New accounts are created with an unusable password and verified phone status. Existing staff accounts cannot sign in through this route. A one-minute repeat-request check and API throttling restrict repeated requests. In local development, the sign-in page explicitly displays the development code and states that no SMS was sent.</p>
+<h3 id="uc03-submit-or-resubmit-a-partner-application">UC03 Submit or resubmit a partner application</h3>
+<p>A rider chooses a home station; a carrier provides vehicle type, licence number and capacity. The UI requires an identity or combined operating document. The API creates the profile in pending status. Owners may resubmit, which resets status to pending and clears the review note. An approved profile is required before matching. Duplicate profile creation and an application for a different account role are rejected. The API requires an upload for creation and rejects approval without a document. Existing approved seed fixtures are illustrative, not proof of real vetting.</p>
+<h3 id="uc04-review-a-partner-application">UC04 Review a partner application</h3>
+<p>Operations or an administrator inspects the application and privately served attachment, then approves or rejects it with a review note. A rejected applicant sees the note and can resubmit. Outcome: approved partners become eligible for assignments, subject to availability, town, vehicle and trip checks. This is a manual review process; identity verification is not delegated to an external service.</p>
+<h2 id="booking-and-assignment-use-cases">Booking and assignment use cases</h2>
+<h3 id="uc05-book-a-parcel">UC05 Book a parcel</h3>
+<p>The customer completes four steps: route, people, parcel and review. Origin and destination are different active stations on an active pilot pair. Recipient details, a supported weight band and a parcel photo are supplied; pickup address and handling instructions are optional. The server calculates the price from the applicable station override or default rate. It creates a six-digit shipment code, a secret recipient token, a booking event and queued notifications. Outcome: a booked shipment with payment still to be recorded. Both UI and API require a valid parcel photo; the API also validates the weight band and Zimbabwe recipient phone.</p>
+<h3 id="uc06-book-for-a-walk-in-sender">UC06 Book for a walk-in sender</h3>
+<p>Authorized booking staff supplies the sender name and phone, then follows UC05. The backend resolves the phone to an existing account or creates a customer account with an unusable password. The shipment keeps sender separately from booked_by so ownership is not confused with the staff member who entered it. Station operators are limited to their own origin station.</p>
+<h3 id="uc07-obtain-a-quote">UC07 Obtain a quote</h3>
+<p>The user selects origin station, destination station and 0–2 kg, 2–5 kg or 5–10 kg. The server uses the city pair and weight band, preferring an origin-station override. The booking UI shows the price in USD before confirmation. Missing tariffs prevent booking. Stored parcel prices are snapshots and are not recalculated when a tariff later changes.</p>
+<h3 id="uc08-schedule-a-carrier-trip">UC08 Schedule a carrier trip</h3>
+<p>An approved carrier or authorized staff selects the route, a future departure and available capacity within the vehicle capacity. The trip appears with available capacity. Carriers manage their own trips. Trips with assigned parcels cannot be edited through the current validation rules. Outcome: an active departure that operations can select for matching.</p>
+<h3 id="uc09-assign-transport">UC09 Assign transport</h3>
+<p>Authorized station staff or operations selects an active future trip and/or an approved available rider. The server verifies route direction, capacity and the rider's town. Weight bands reserve their upper bounds of 2, 5 or 10 kg. Assigning creates offered tasks; conflicting active offers for the same leg are declined. Outcome: designated workers receive tasks. Matching remains manual.</p>
+<h3 id="uc10-respond-to-an-assignment">UC10 Respond to an assignment</h3>
+<p>Only the assigned worker can accept or decline an offered task. An accepted task is required before collecting a parcel for pickup, carrier departure or home delivery. Already answered offers cannot be answered again. Outcome: the task becomes accepted or declined; accepting does not itself transfer custody.</p>
+<h2 id="payment-and-custody-use-cases">Payment and custody use cases</h2>
+<h3 id="uc11-record-and-review-a-receipt">UC11 Record and review a receipt</h3>
+<p>The sender, authorized station/operations staff or a worker with an accepted assignment uploads a receipt image and selects a payment method. The amount comes from the booked price. Finance, operations or an administrator reviews the receipt and marks it verified or rejected. A verified record cannot be replaced. Dispatch and home-delivery departure require a verified payment. Outcome: evidence and the reviewer identity are retained; no charge is executed by the app.</p>
+<h3 id="uc12-collect-a-first-mile-parcel">UC12 Collect a first-mile parcel</h3>
+<p>An assigned rider accepts the pickup task and requests the next handover code. The independent releasing party receives the code. On collection, the rider submits picked_up and the code. The server requires a pickup address, a matching accepted task and the correct receiving worker. Outcome: rider custody is recorded. Origin-station receipt later completes the pickup task.</p>
+<h3 id="uc13-receive-a-parcel-at-origin">UC13 Receive a parcel at origin</h3>
+<p>The origin operator confirms at_origin_station using the sender's or current rider's code. The operator must be the designated receiving custodian and must differ from the releasing account. The server records both parties and advances the shipment. A walk-in drop-off can move directly from booked to origin receipt. Payment verification is needed before subsequent carrier departure.</p>
+<h3 id="uc14-transport-between-towns">UC14 Transport between towns</h3>
+<p>The carrier accepts its task, obtains the origin operator's code and confirms in_transit. On arrival, the destination operator obtains the carrier's code and confirms at_destination_station. The receiving account, sequence, code validity and accepted task are checked. Outcome: the carrier task completes when the destination station confirms receipt.</p>
+<h3 id="uc15-select-the-receiving-method">UC15 Select the receiving method</h3>
+<p>The sender uses the authenticated shipment page or the recipient opens the secret tracking link. The user chooses station collection or home delivery; home delivery requires an address. The preference is locked once out_for_delivery or a closed state is reached. Public tracking shows only recipient-safe shipment information. Possession of the link authorizes access to that shipment.</p>
+<h3 id="uc16-complete-station-collection">UC16 Complete station collection</h3>
+<p>At the destination station, the recipient generates a receiving code using the secret link. The destination operator confirms delivered. The server requires station collection preference and the correct operator. Outcome: a recipient-confirmed delivery event is recorded and current_holder becomes null, representing release from network custody.</p>
+<h3 id="uc17-complete-home-delivery">UC17 Complete home delivery</h3>
+<p>A destination-town rider accepts a last-mile task, collects from the station using its releasing-party code and confirms out_for_delivery. At the recipient, the rider submits the recipient's receiving code, a delivery photo and a confirmed signature image. The server requires the assigned rider and both images. Outcome: delivered status and completed last-mile task, with private proof files.</p>
+<h2 id="exceptions-and-finance-use-cases">Exceptions and finance use cases</h2>
+<h3 id="uc18-cancel-before-dispatch">UC18 Cancel before dispatch</h3>
+<p>The sender, operations or administrator supplies a reason while the parcel is booked or at_origin_station and has no verified payment. The server appends a cancellation event, sets cancelled and declines active tasks. A paid or already transported parcel requires support handling. No automated refund workflow exists.</p>
+<h3 id="uc19-record-an-exception-and-return">UC19 Record an exception and return</h3>
+<p>A permitted custodian or station/operations user records the issue. The server retains an exception event and status. The supported next custody state is returned, confirmed by a station operator using a fresh code issued to the sender. Retrying delivery and automatic exception recovery are not implemented as state transitions.</p>
+<h3 id="uc20-allocate-and-settle-a-payout">UC20 Allocate and settle a payout</h3>
+<p>Finance, operations or administrator selects a delivered parcel with a verified payment and enters first-mile rider, last-mile rider, carrier and origin-station allocations for a period. The remaining price becomes the platform allocation. Negative or over-budget amounts and repeated payout runs are rejected. Each nonzero partner allocation needs a beneficiary. Lines progress from pending to approved to paid; the last step records an external reference after payment outside the app. Outcome: balanced allocations and finance audit events for the run, approval, disbursement and receipt review. Legacy single-rider requests remain supported only when they do not ambiguously combine two different completed riders.</p>
+<h3 id="uc21-review-earnings">UC21 Review earnings</h3>
+<p>A partner opens its own beneficiary-scoped allocations and downloadable statements. The overview distinguishes allocated amounts from the recorded status of payment. It does not connect to a bank or wallet. First-mile and last-mile rider allocations are separately recorded using the completed task's worker, so replacing the active rider does not lose the pickup beneficiary.</p>
+<h2 id="support-and-administration-use-cases">Support and administration use cases</h2>
+<h3 id="uc22-manage-support">UC22 Manage support</h3>
+<p>An account holder opens an issue, optionally linking a permitted shipment. Support, operations and administrator manage the network conversation and status. Messages retain author and time in the ticket JSON. Tickets created outside 08:00–20:00 Africa/Harare are flagged after hours. Creation, replies and status changes enter the helpdesk outbox. After-hours contacts are deferred until the next 08:00 opening; this queues delivery, not an automated staff SLA. The configured phone line and public helpdesk link are shown in the support page.</p>
+<h3 id="uc23-notifications-and-addresses">UC23 Notifications and addresses</h3>
+<p>Users view notifications addressed to their account phone, mark them read and follow shipment links. Customers create and remove saved addresses and choose one default. A database constraint permits only one default address per account. Read status and external SMS delivery status are different concepts.</p>
+<p>Self-service profile updates cannot change the verified phone. A separately verified administrative process is required for phone migration; otherwise a user could claim another person's notification address.</p>
+<h3 id="uc24-offline-handover">UC24 Offline handover</h3>
+<p>The field worker records a handover while disconnected. The device stores the submission, files, owning account and retry key in IndexedDB. On reconnection, queued work for that account is submitted. Successful task completion retries return the stored result for the same key and payload. Invalid or expired codes remain visible as failed queue entries; the user must obtain a fresh code and record a new submission. An offline capture is not a confirmed server handover.</p>
+<h3 id="uc25-review-reports-and-audit">UC25 Review reports and audit</h3>
+<p>Authorized staff view volumes, delivered shipments, verified revenue, recorded disbursements and quality measures with their qualifying counts. Custody viewers can inspect accepted events and rejected attempts with named parties. The event archive can be checked or used to rebuild status and holder projections after replication is drained. A separate archive is not a substitute for database and media backups.</p>
+<h3 id="uc26-manage-accounts-and-configuration">UC26 Manage accounts and configuration</h3>
+<p>Administrators create users, edit their role or access status and manage pilot activation. Authorized reference-data staff manage stations and rates; finance can edit rates through its authorized API. User deletion deactivates the account. Provider readiness is read from server configuration; secrets are not editable in the web UI.</p>
+<h2 id="acceptance-criteria">Acceptance criteria</h2>
+<ol>
+<li>An account never gains access to another customer's shipment through global search.</li>
+<li>A booking price is calculated by the server and matches the displayed quote.</li>
+<li>Carrier and home-delivery departure fail when payment is unverified.</li>
+<li>Every custody change checks order, independent parties and a fresh per-step code.</li>
+<li>Home delivery fails without a proof photo and signature.</li>
+<li>A completed handover retry does not create a second transition.</li>
+<li>A payout run balances to the booked price and cannot be repeated.</li>
+<li>Recipient tracking does not reveal internal notes, staff identities or finance records.</li>
+<li>Long forms scroll inside dialogs while their actions remain reachable.</li>
+<li>Desktop lists and narrow-screen cards show readable names without unintended horizontal scrolling.</li>
+</ol>
+<h2 id="additional-parcel-care-use-cases-2-october-2026">Additional parcel-care use cases (2 October 2026)</h2>
+<p>UC27–UC52 extend existing journeys with cancellations, RTS, failed delivery, refunds, claims, policy, dimensions/capacity, locations, custody evidence, administration, fraud reviews, corrections, performance and exports. See the <a href="operational-completion.html">operational completion guide</a> for exact behavior, permissions, policy configuration and external prerequisites. Open <strong>Exceptions &amp; parcel care</strong> in web or mobile. Existing UC01–UC26 videos have not been regenerated.</p>
+<h2 id="implementation-references">Implementation references</h2>
+<ul>
+<li>Roles and data: backend/marketplace/models.py</li>
+<li>Custody, phone verification and settlement: backend/marketplace/workflows.py</li>
+<li>Booking, matching and payment services: backend/marketplace/services.py</li>
+<li>API permissions: backend/marketplace/permissions.py and views.py</li>
+<li>Active UI: frontend/src/workspace and frontend/src/pages/Auth.tsx</li>
+<li>Related documents: <a href="workflows.html">Workflows</a> and <a href="database.html">Database reference</a></li>
+</ul><footer>Source-verified implementation · Version 1.1 · 1 October 2026. Print from the browser for a PDF copy.</footer></main></body></html>

@@ -1,0 +1,262 @@
+[
+  {
+    "id": "UC01",
+    "title": "Sign in with credentials",
+    "role": "customer",
+    "coverage": "Completed sign-in",
+    "file": "UC01.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 208189
+  },
+  {
+    "id": "UC02",
+    "title": "Verify a phone",
+    "role": "guest",
+    "coverage": "Completed development phone verification; no SMS sent",
+    "file": "UC02.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 271410
+  },
+  {
+    "id": "UC03",
+    "title": "Resubmit a partner application",
+    "role": "applicant",
+    "coverage": "Completed document resubmission",
+    "file": "UC03.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 494189
+  },
+  {
+    "id": "UC04",
+    "title": "Review a partner application",
+    "role": "ops",
+    "coverage": "Completed approval of the uploaded demonstration application",
+    "file": "UC04.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 331316
+  },
+  {
+    "id": "UC05",
+    "title": "Book a parcel",
+    "role": "customer",
+    "coverage": "Completed photo booking",
+    "file": "UC05.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 807650
+  },
+  {
+    "id": "UC06",
+    "title": "Book for a walk-in sender",
+    "role": "station_operator",
+    "coverage": "Completed walk-in booking",
+    "file": "UC06.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 826271
+  },
+  {
+    "id": "UC07",
+    "title": "Obtain a route and weight quote",
+    "role": "customer",
+    "coverage": "Live server quote",
+    "file": "UC07.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 733160
+  },
+  {
+    "id": "UC08",
+    "title": "Schedule a carrier trip",
+    "role": "carrier",
+    "coverage": "Completed future trip scheduling",
+    "file": "UC08.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 889237
+  },
+  {
+    "id": "UC09",
+    "title": "Assign a rider or trip",
+    "role": "ops",
+    "coverage": "Completed first-mile rider assignment",
+    "file": "UC09.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 522358
+  },
+  {
+    "id": "UC10",
+    "title": "Accept an assignment",
+    "role": "rider",
+    "coverage": "Completed acceptance",
+    "file": "UC10.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 359507
+  },
+  {
+    "id": "UC11",
+    "title": "Submit and review payment evidence",
+    "role": "customer",
+    "coverage": "Completed receipt upload and finance verification",
+    "file": "UC11.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 724586
+  },
+  {
+    "id": "UC12",
+    "title": "Collect a first-mile parcel",
+    "role": "rider",
+    "coverage": "Completed code-confirmed pickup",
+    "file": "UC12.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 393861
+  },
+  {
+    "id": "UC13",
+    "title": "Receive a parcel at origin",
+    "role": "station_operator",
+    "coverage": "Completed code-confirmed station receipt",
+    "file": "UC13.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 536721
+  },
+  {
+    "id": "UC14",
+    "title": "Transport between towns",
+    "role": "carrier",
+    "coverage": "Completed departure and destination station receipt",
+    "file": "UC14.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 1031689
+  },
+  {
+    "id": "UC15",
+    "title": "Choose a receiving method",
+    "role": "guest",
+    "coverage": "Completed guest home-delivery preference",
+    "file": "UC15.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 437406
+  },
+  {
+    "id": "UC16",
+    "title": "Complete station collection",
+    "role": "station_chipinge",
+    "coverage": "Completed recipient-code-confirmed collection by destination operator",
+    "file": "UC16.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 553281
+  },
+  {
+    "id": "UC17",
+    "title": "Complete home delivery",
+    "role": "rider",
+    "coverage": "Delivery photo and drawn signature preview; native signature save and completion unrecorded",
+    "file": "UC17.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 368872
+  },
+  {
+    "id": "UC18",
+    "title": "Cancel before dispatch",
+    "role": "customer",
+    "coverage": "Completed cancellation",
+    "file": "UC18.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 394700
+  },
+  {
+    "id": "UC19",
+    "title": "Record an exception and return",
+    "role": "ops",
+    "coverage": "Completed exception and fresh sender-code-confirmed return",
+    "file": "UC19.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 742918
+  },
+  {
+    "id": "UC20",
+    "title": "Allocate and settle a payout",
+    "role": "finance",
+    "coverage": "Completed allocation, approval and DEMO external disbursement reference; no real payment",
+    "file": "UC20.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 824979
+  },
+  {
+    "id": "UC21",
+    "title": "Review earnings and statements",
+    "role": "rider",
+    "coverage": "Beneficiary-scoped statement review",
+    "file": "UC21.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 207208
+  },
+  {
+    "id": "UC22",
+    "title": "Manage support",
+    "role": "customer",
+    "coverage": "Completed customer ticket, support reply and resolution",
+    "file": "UC22.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 1041029
+  },
+  {
+    "id": "UC23",
+    "title": "Notifications and saved addresses",
+    "role": "customer",
+    "coverage": "Notification review and completed address creation",
+    "file": "UC23.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 489641
+  },
+  {
+    "id": "UC24",
+    "title": "Offline handover synchronization",
+    "role": "rider",
+    "coverage": "Native-only limitation walkthrough; no offline capture simulated",
+    "file": "UC24.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 305531
+  },
+  {
+    "id": "UC25",
+    "title": "Reports and custody audit",
+    "role": "ops",
+    "coverage": "Live report and audit review",
+    "file": "UC25.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 227542
+  },
+  {
+    "id": "UC26",
+    "title": "Accounts and network configuration",
+    "role": "admin",
+    "coverage": "Completed demo staff creation and network configuration save",
+    "file": "UC26.webm",
+    "status": "recorded",
+    "runtime": [],
+    "bytes": 749796
+  }
+]

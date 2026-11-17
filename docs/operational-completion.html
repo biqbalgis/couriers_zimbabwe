@@ -1,0 +1,187 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Parcel exceptions and operational completion</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f6f4;color:#24392f;font:16px/1.65 Arial,Helvetica,sans-serif}.toolbar{background:#102f28;color:white;padding:16px 24px;display:flex;flex-wrap:wrap;gap:18px}.toolbar a{color:white;font-size:14px}.document{max-width:1120px;margin:32px auto;padding:48px 56px;background:white;border:1px solid #e0e8e3;border-radius:12px}h1,h2,h3{color:#000;line-height:1.25;scroll-margin-top:24px}h1{font-size:36px}h2{font-size:25px;margin-top:40px;border-bottom:1px solid #e0e8e3;padding-bottom:10px}h3{font-size:19px;margin-top:28px}a{color:#146c56}code{font:13px Consolas,monospace;overflow-wrap:anywhere}pre{background:#f5f7f5;padding:18px;border:1px solid #e0e8e3;border-radius:6px;overflow:auto}.table-wrap{overflow-x:auto;margin:20px 0}table{border-collapse:collapse;width:100%;font-size:13px;line-height:1.5}th,td{border:1px solid #d9d9d9;padding:10px 12px;text-align:left;vertical-align:middle;overflow-wrap:anywhere}th{background:#eaf0ec;color:black}tr:nth-child(even) td{background:#fafcfb}figure{margin:24px 0}figure svg{width:100%;height:auto;display:block}figcaption,footer{font-size:13px;color:#62766d}li{margin:6px 0}details{margin:16px 0}summary{cursor:pointer}footer{border-top:1px solid #e0e8e3;margin-top:40px;padding-top:16px}@media(max-width:700px){.document{margin:12px;padding:24px 18px}h1{font-size:28px}table{font-size:12px}}@media print{@page{size:A4;margin:18mm}.toolbar{display:none}body{background:white;font-size:10.5pt}.document{border:0;margin:0;padding:0;max-width:none}h1{font-size:25pt}h2{font-size:17pt;break-after:avoid}h3{font-size:13pt;break-after:avoid}table{font-size:8.5pt}thead{display:table-header-group}tr,figure{break-inside:avoid}.table-wrap{overflow:visible}pre{white-space:pre-wrap;overflow-wrap:anywhere}details{display:none}}</style></head><body><nav class="toolbar" aria-label="Document navigation"><a href="use-cases.html">Use cases</a><a href="workflows.html">Workflows</a><a href="database.html">Database and ER</a><a href="proposal-audit.html">Proposal audit</a><a href="launch-runbook.html">Launch runbook</a><a href="training.html">Training</a></nav><main class="document"><h1 id="parcel-exceptions-and-operational-completion">Parcel exceptions and operational completion</h1>
+<p>Implemented 2 October 2026 in the canonical Django API, React/MUI workspace and React Native/Expo application.</p>
+<p>Open <strong>Exceptions &amp; parcel care</strong> in either application. Customers and field workers see only their permitted shipments; operations, finance and support retain their existing role scopes. Tabs provide an exception inbox, cases, delivery attempts, custody evidence, administrative audit, performance, exports and policy.</p>
+<h2 id="feature-coverage">Feature coverage</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Feature</th>
+<th>Implemented behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>UC27</td>
+<td>Cancellation</td>
+<td>Sender request; automatic cancellation only for unassigned sender-held bookings; operations approval for assigned/collected parcels; stage-specific snapshotted fees; declines outstanding work and releases cancelled trip reservations.</td>
+</tr>
+<tr>
+<td>UC28</td>
+<td>Return to sender</td>
+<td>Approved case; destination collection, reverse-route trip, origin receipt and sender-confirmed collection. Origin-only returns skip inter-town movement. Every handover needs an independent expiring code and condition photo.</td>
+</tr>
+<tr>
+<td>UC29</td>
+<td>Failed delivery</td>
+<td>Accepted last-mile rider records unavailable recipient, incorrect address, refusal or unreachable recipient; chooses contact, scheduled retry or return review. Exhausted attempts stop forward delivery.</td>
+</tr>
+<tr>
+<td>UC30</td>
+<td>Refund management</td>
+<td>Request, independent approval, amount/fee checks, external payout reconciliation when needed, unique external payment reference and append-only audit. Original payment/payout records are preserved.</td>
+</tr>
+<tr>
+<td>UC31</td>
+<td>Loss/damage claims</td>
+<td>Claim, case-linked private photo evidence, independent review, cumulative declared-value/liability ceiling, approval and external compensation reference.</td>
+</tr>
+<tr>
+<td>UC32</td>
+<td>Liability / insurance</td>
+<td>Declared value and booking-time policy snapshot. Compensation requires reviewed terms and configured liability. Insurance is explicitly unavailable; the API rejects unintegrated insurance advertising.</td>
+</tr>
+<tr>
+<td>UC33</td>
+<td>Prohibited/restricted items</td>
+<td>Server-enforced normalized categories and configurable prohibited/restricted lists displayed during booking. Restricted categories require operations handling outside standard booking.</td>
+</tr>
+<tr>
+<td>UC34</td>
+<td>Dimensions and size limits</td>
+<td>Complete positive length/width/height, optional mandatory dimensions, maximum dimensions and volume. Existing dimension-less bookings remain usable on weight-only trips.</td>
+</tr>
+<tr>
+<td>UC35</td>
+<td>Carrier capacity</td>
+<td>Transaction-locked weight/volume reservations, including approved/in-progress returns. Volume-limited trips reject parcels without dimensions.</td>
+</tr>
+<tr>
+<td>UC36</td>
+<td>Carrier schedules</td>
+<td>Origin, destination, future departure, vehicle registration, weight and volume capacity; route, worker eligibility and vehicle limits are checked.</td>
+</tr>
+<tr>
+<td>UC37</td>
+<td>Addresses and locations</td>
+<td>Full addresses/instructions, saved-address reuse, interactive map pins and permission-based GPS. Coordinates are EPSG:4326. Configurable authenticated address search offers suggestions, not a delivery guarantee.</td>
+</tr>
+<tr>
+<td>UC38</td>
+<td>Attempt history</td>
+<td>API records include rider, failure reason, time, next action, retry time and optional coordinates. Existing attempts cannot be overwritten through the API.</td>
+</tr>
+<tr>
+<td>UC39</td>
+<td>Custody photos</td>
+<td>Private evidence attaches to parcel, claim or accepted custody event. Station handovers accept a photo; returns require one. Booking/delivery proof remain canonical.</td>
+</tr>
+<tr>
+<td>UC40</td>
+<td>Notifications</td>
+<td>Administrator-configured event triggers use the existing durable outbox for custody, booking, failed delivery and case changes. This does not configure a live SMS provider.</td>
+</tr>
+<tr>
+<td>UC41</td>
+<td>User management</td>
+<td>Create, update/deactivate accounts and assign existing roles. Additional refund-approval and refund-payment permissions are separately assignable to eligible staff and audited.</td>
+</tr>
+<tr>
+<td>UC42</td>
+<td>Station management</td>
+<td>Contact, address, coordinates, opening-hours information, active/service status and holding capacity. Closed/full stations reject new bookings.</td>
+</tr>
+<tr>
+<td>UC43</td>
+<td>Partner lifecycle</td>
+<td>Existing application rejection; reasoned suspension, re-verification or reactivation. Accepted work must be reassigned first. Expired/suspended/unverified workers cannot accept or start work.</td>
+</tr>
+<tr>
+<td>UC44</td>
+<td>Administrative audit</td>
+<td>Before/after user, permission, station, rate, partner and trip changes; operational decisions, payment reviews, policy, corrections and exports. Passwords/OTPs/arbitrary settings values are excluded.</td>
+</tr>
+<tr>
+<td>UC45</td>
+<td>Operational corrections</td>
+<td>Reasoned recipient/address corrections and unassigned station corrections preserving the quote. Non-return exceptions can restore their recorded previous custody state with a new event; arbitrary status/holder jumps are prohibited.</td>
+</tr>
+<tr>
+<td>UC46</td>
+<td>Duplicate/fraud controls</td>
+<td>Recent booking fingerprints, receipt SHA-256 reuse and transaction-reference reuse. Suspicious evidence blocks verification until reasoned review. These are heuristics, not a fraud guarantee.</td>
+</tr>
+<tr>
+<td>UC47</td>
+<td>Customer history</td>
+<td>Existing paginated/filterable parcel history covers active/closed bookings and payments; cases and receipts are reachable from each parcel.</td>
+</tr>
+<tr>
+<td>UC48</td>
+<td>Saved recipients/addresses</td>
+<td>Private records include recipient contact, coordinates and instructions and can prefill repeat bookings.</td>
+</tr>
+<tr>
+<td>UC49</td>
+<td>Digital receipt</td>
+<td>Download/share authenticated booking/payment confirmation; not a tax invoice and never represents pending payment as verified.</td>
+</tr>
+<tr>
+<td>UC50</td>
+<td>Performance</td>
+<td>Station shipment/delivery/exception/cancellation counts, current carrier shipment/delivery/exception counts, rider failed attempts and existing pilot quality reports. Operational counts, not historical assignment or SLA certification.</td>
+</tr>
+<tr>
+<td>UC51</td>
+<td>Operational exports</td>
+<td>Authenticated shipment, customer, station, carrier, attempt, exception and audit CSV exports. Formula-like text is neutralized.</td>
+</tr>
+<tr>
+<td>UC52</td>
+<td>Exception inbox</td>
+<td>Scoped parcels with open cases, exception state, unresolved payment/handover problems or stale progress, linked to the original journey. Resolved handover failures and closed journeys without open cases leave the inbox.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="cancellation-and-physical-returns">Cancellation and physical returns</h2>
+<ol>
+<li>Unassigned sender-held bookings can close immediately. Paid bookings create refund <strong>requests</strong>, not transfers.</li>
+<li>Assigned bookings need operations approval and use the assignment-stage fee.</li>
+<li>After pickup, cancellation stops outstanding forward tasks and creates an approved return. The parcel remains in exception custody until physical return completion.</li>
+<li>Origin-held parcels go to sender collection; first-mile custody can return to the origin station without inventing a reverse trip.</li>
+<li>Destination-station parcels start from reverse-carrier collection. Failed home-delivery parcels can first be collected by a destination rider or received by the destination station.</li>
+<li>Return codes are hashed, expire after 15 minutes, cannot reset while active, allow at most five incorrect attempts and never appear in case lists. Intermediate codes come from the releasing party; final confirmation comes from the sender.</li>
+</ol>
+<p>The system records fees; it does not charge a bank account. Refund approval deducts applicable approved fees and earlier reserved refunds. If partner payouts were approved/paid, finance must reconcile externally and supply a reference rather than rewrite payout history.</p>
+<h2 id="policy-and-permissions">Policy and permissions</h2>
+<p>Administrator: <strong>Exceptions &amp; parcel care → Policy → Edit policy</strong>. The JSON form uses a dedicated DRF validator. Configure reviewed terms, fees, liability, size limits, restricted/prohibited categories, maximum attempts, stale-progress hours and notification events. Bookings retain their policy snapshot; current rule changes do not silently change past charges or compensation limits.</p>
+<p>Initial fees/liability are zero, dimensions optional and terms unreviewed. These are explicit development placeholders, <strong>not approved business or insurance terms</strong>. An owner must set and review policy before launch.</p>
+<p>Existing role permissions remain. Finance/administrators can review and record financial cases. Administrators can additionally grant eligible operations/support staff:</p>
+<ul>
+<li>approve_refund: approve/reject refund and compensation cases.</li>
+<li>record_refund_payment: record already-approved external refund/compensation payments.</li>
+</ul>
+<p>Use the account's delegated-permission JSON field: ["approve_refund"], ["record_refund_payment"], both, or []. One permission does not grant the other, broaden unrelated access, or permit customers to approve their own claims.</p>
+<p>Operational cases, attempts, evidence, audit, payment, payout, parcel and task records are read-only in Django admin; mutate them through service-controlled application workflows.</p>
+<h2 id="locations-and-external-prerequisites">Locations and external prerequisites</h2>
+<p>Web maps use OpenLayers: display EPSG:3857 coordinates convert to stored EPSG:4326 pins. Native maps use React Native Maps. Rebuild native apps after the Expo Location permission/plugin change. Android map credentials and device GPS permission behavior require deployment/device verification.</p>
+<p>Address search is off by default. To enable an operator-owned/contracted <strong>Nominatim-compatible</strong> HTTPS gateway, configure GEOCODING_URL, optionally GEOCODING_TOKEN and an identifying GEOCODING_USER_AGENT. Searches are authenticated and explicit, with Zimbabwe filtering, bounded responses/timeouts and no redirects. No public geocoder/subscription/insurance policy is silently selected. Suggestions are not postal validation; confirm ambiguous addresses and access instructions with the recipient.</p>
+<p>Payments, refunds and compensation remain external. SMS/helpdesk delivery still requires configured providers and the outbox worker. Insurance is not integrated or advertised.</p>
+<h2 id="deployment-and-verification">Deployment and verification</h2>
+<p>Apply migrations <strong>0006–0008</strong> before restarting the API. They add metadata, operational tables/indexes, a unique case payment reference and financial permissions. Existing payment/payout amounts are not rewritten.</p>
+<p>Backend checks:</p>
+<pre><code>python manage.py migrate
+python manage.py check
+python manage.py test marketplace
+python manage.py spectacular --file schema.yml
+</code></pre>
+<p>Frontend/mobile checks, run from their respective folders:</p>
+<pre><code>npm.cmd run build
+npm.cmd run typecheck
+npm.cmd run lint
+npm.cmd test
+npx.cmd expo-doctor
+</code></pre>
+<p>Browser acceptance uses mobile/tests/mobile_test_settings.py and an isolated SQLite database, never the developer database. The operations-acceptance.mjs script tests all role tabs in both previews, then submits bookings with dimensions/value/map coordinates and damage claims. Native exports prove bundling, not installation, GPS accuracy, live provider delivery or production deployment.</p>
+<p>Prior UC01–UC26 videos remain unchanged and predate these additional workflows.</p>
+<p>Dependency audit currently reports 16 mobile dependency findings (4 high, 12 moderate), primarily in the Expo tooling/router tree. Resolve with SDK-compatible patches before release; do not use the suggested forced downgrade to Expo 44.</p><footer>Source-verified implementation. See the document header and update notes for version details. Print from the browser for a PDF copy.</footer></main></body></html>

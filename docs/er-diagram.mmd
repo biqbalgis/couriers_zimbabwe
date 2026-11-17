@@ -1,0 +1,325 @@
+erDiagram
+  django_admin_log {
+    auto id PK
+    datetime action_time
+    bigint user_id FK
+    bigint content_type_id FK "nullable"
+    text object_id "nullable"
+    char object_repr
+    positivesmallinteger action_flag
+    text change_message
+  }
+  auth_permission {
+    auto id PK
+    char name
+    bigint content_type_id FK
+    char codename
+  }
+  auth_group_permissions {
+    auto id PK
+    bigint group_id FK
+    bigint permission_id FK
+  }
+  auth_group {
+    auto id PK
+    char name UK
+  }
+  django_content_type {
+    auto id PK
+    char app_label
+    char model
+  }
+  django_session {
+    char session_key PK
+    text session_data
+    datetime expire_date
+  }
+  marketplace_user_groups {
+    bigauto id PK
+    bigint user_id FK
+    bigint group_id FK
+  }
+  marketplace_user_user_permissions {
+    bigauto id PK
+    bigint user_id FK
+    bigint permission_id FK
+  }
+  marketplace_user {
+    bigauto id PK
+    char password
+    datetime last_login "nullable"
+    boolean is_superuser
+    char username UK
+    char first_name
+    char last_name
+    char email
+    boolean is_staff
+    boolean is_active
+    datetime date_joined
+    char role
+    char phone UK
+    char name
+    boolean verified
+  }
+  marketplace_city {
+    bigauto id PK
+    char name
+    char province
+  }
+  marketplace_station {
+    bigauto id PK
+    char name
+    bigint city_id FK
+    text address
+    decimal latitude "nullable"
+    decimal longitude "nullable"
+    bigint operator_id FK
+    boolean active
+    char payment_number
+  }
+  marketplace_carrier {
+    bigauto id PK
+    text review_note
+    bigint user_id FK,UK
+    char vehicle_type
+    char licence_no UK
+    decimal capacity_kg
+    char status
+    file document
+  }
+  marketplace_rider {
+    bigauto id PK
+    text review_note
+    bigint user_id FK,UK
+    bigint home_station_id FK
+    char status
+    boolean available
+    file document
+  }
+  marketplace_ratetableentry {
+    bigauto id PK
+    bigint origin_city_id FK
+    bigint destination_city_id FK
+    char weight_band
+    decimal price
+    bigint station_override_id FK "nullable"
+  }
+  marketplace_parcel {
+    bigauto id PK
+    text pickup_address
+    char sender_name
+    char sender_phone
+    bigint booked_by_id FK "nullable"
+    bigint trip_id FK "nullable"
+    datetime otp_expires_at "nullable"
+    char otp_target
+    positivesmallinteger otp_attempts
+    text notes
+    char delivery_choice
+    text delivery_address
+    char code UK
+    bigint sender_id FK
+    char recipient_name
+    char recipient_phone
+    char recipient_access_token UK
+    bigint origin_station_id FK
+    bigint destination_station_id FK
+    char weight_band
+    decimal price
+    file photo
+    char status
+    bigint current_holder_id FK "nullable"
+    bigint assigned_carrier_id FK "nullable"
+    bigint assigned_rider_id FK "nullable"
+    char handover_otp
+    datetime created_at
+  }
+  marketplace_task {
+    bigauto id PK
+    bigint parcel_id FK
+    char type
+    bigint assigned_to_id FK
+    char status
+    file proof_photo
+    file signature
+  }
+  marketplace_statusevent {
+    bigauto id PK
+    bigint released_by_id FK "nullable"
+    bigint received_by_id FK "nullable"
+    boolean recipient_confirmed
+    bigint parcel_id FK
+    char from_status
+    char to_status
+    bigint actor_id FK "nullable"
+    text note
+    boolean otp_used
+    boolean accepted
+    datetime timestamp
+  }
+  marketplace_payment {
+    bigauto id PK
+    char transaction_reference
+    bigint parcel_id FK,UK
+    decimal amount
+    char method
+    file receipt_photo
+    char status
+    bigint verified_by_id FK "nullable"
+    datetime verified_at "nullable"
+  }
+  marketplace_payout {
+    char leg
+    bigauto id PK
+    bigint beneficiary_id FK "nullable"
+    bigint approved_by_id FK "nullable"
+    datetime approved_at "nullable"
+    datetime disbursed_at "nullable"
+    char payment_reference
+    bigint parcel_id FK
+    char recipient
+    char period
+    decimal amount
+    char status
+    char statement_url
+  }
+  marketplace_supportticket {
+    bigauto id PK
+    bigint raised_by_id FK
+    bigint parcel_id FK "nullable"
+    char subject
+    char status
+    json messages
+    char external_reference
+    boolean received_after_hours
+    datetime created_at
+  }
+  marketplace_notification {
+    bigauto id PK
+    text message
+    datetime read_at "nullable"
+    bigint parcel_id FK
+    char channel
+    char trigger_event
+    char recipient_phone
+    datetime sent_at "nullable"
+    char status
+  }
+  marketplace_address {
+    bigauto id PK
+    bigint user_id FK
+    char label
+    char contact_name
+    char phone
+    bigint city_id FK
+    text address
+    boolean is_default
+  }
+  marketplace_platformsettings {
+    bigauto id PK
+    char key UK
+    json value
+  }
+  marketplace_pilotroute {
+    bigauto id PK
+    char name
+    bigint origin_city_id FK
+    bigint destination_city_id FK
+    boolean active
+  }
+  marketplace_carriertrip {
+    bigauto id PK
+    bigint carrier_id FK
+    bigint origin_city_id FK
+    bigint destination_city_id FK
+    datetime departure_at
+    decimal capacity_kg
+    boolean active
+  }
+  marketplace_phonechallenge {
+    bigauto id PK
+    char phone
+    char code_hash
+    char name
+    char role
+    datetime expires_at
+    positivesmallinteger attempts
+    boolean used
+    datetime created_at
+  }
+  marketplace_integrationdelivery {
+    datetime available_at
+    bigauto id PK
+    char kind
+    json payload
+    char status
+    positiveinteger attempts
+    text last_error
+    char external_reference
+    datetime created_at
+    datetime delivered_at "nullable"
+  }
+  marketplace_financeevent {
+    bigauto id PK
+    bigint actor_id FK
+    char action
+    char reference
+    json details
+    datetime created_at
+  }
+  marketplace_mutationreceipt {
+    bigauto id PK
+    bigint user_id FK
+    char key
+    char fingerprint
+    json response
+    datetime created_at
+  }
+  marketplace_user ||--o{ django_admin_log : "user"
+  django_content_type |o--o{ django_admin_log : "content_type"
+  django_content_type ||--o{ auth_permission : "content_type"
+  auth_group ||--o{ auth_group_permissions : "group"
+  auth_permission ||--o{ auth_group_permissions : "permission"
+  marketplace_user ||--o{ marketplace_user_groups : "user"
+  auth_group ||--o{ marketplace_user_groups : "group"
+  marketplace_user ||--o{ marketplace_user_user_permissions : "user"
+  auth_permission ||--o{ marketplace_user_user_permissions : "permission"
+  marketplace_city ||--o{ marketplace_station : "city"
+  marketplace_user ||--o{ marketplace_station : "operator"
+  marketplace_user ||--o| marketplace_carrier : "user"
+  marketplace_user ||--o| marketplace_rider : "user"
+  marketplace_station ||--o{ marketplace_rider : "home_station"
+  marketplace_city ||--o{ marketplace_ratetableentry : "origin_city"
+  marketplace_city ||--o{ marketplace_ratetableentry : "destination_city"
+  marketplace_station |o--o{ marketplace_ratetableentry : "station_override"
+  marketplace_user |o--o{ marketplace_parcel : "booked_by"
+  marketplace_carriertrip |o--o{ marketplace_parcel : "trip"
+  marketplace_user ||--o{ marketplace_parcel : "sender"
+  marketplace_station ||--o{ marketplace_parcel : "origin_station"
+  marketplace_station ||--o{ marketplace_parcel : "destination_station"
+  marketplace_user |o--o{ marketplace_parcel : "current_holder"
+  marketplace_carrier |o--o{ marketplace_parcel : "assigned_carrier"
+  marketplace_rider |o--o{ marketplace_parcel : "assigned_rider"
+  marketplace_parcel ||--o{ marketplace_task : "parcel"
+  marketplace_user ||--o{ marketplace_task : "assigned_to"
+  marketplace_user |o--o{ marketplace_statusevent : "released_by"
+  marketplace_user |o--o{ marketplace_statusevent : "received_by"
+  marketplace_parcel ||--o{ marketplace_statusevent : "parcel"
+  marketplace_user |o--o{ marketplace_statusevent : "actor"
+  marketplace_parcel ||--o| marketplace_payment : "parcel"
+  marketplace_user |o--o{ marketplace_payment : "verified_by"
+  marketplace_user |o--o{ marketplace_payout : "beneficiary"
+  marketplace_user |o--o{ marketplace_payout : "approved_by"
+  marketplace_parcel ||--o{ marketplace_payout : "parcel"
+  marketplace_user ||--o{ marketplace_supportticket : "raised_by"
+  marketplace_parcel |o--o{ marketplace_supportticket : "parcel"
+  marketplace_parcel ||--o{ marketplace_notification : "parcel"
+  marketplace_user ||--o{ marketplace_address : "user"
+  marketplace_city ||--o{ marketplace_address : "city"
+  marketplace_city ||--o{ marketplace_pilotroute : "origin_city"
+  marketplace_city ||--o{ marketplace_pilotroute : "destination_city"
+  marketplace_carrier ||--o{ marketplace_carriertrip : "carrier"
+  marketplace_city ||--o{ marketplace_carriertrip : "origin_city"
+  marketplace_city ||--o{ marketplace_carriertrip : "destination_city"
+  marketplace_user ||--o{ marketplace_financeevent : "actor"
+  marketplace_user ||--o{ marketplace_mutationreceipt : "user"
